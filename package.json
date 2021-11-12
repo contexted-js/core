@@ -1,0 +1,21 @@
+{
+	"name": "@contexted/core",
+	"version": "0.0.1",
+	"description": "Modular TypeScript application framework",
+	"keywords": [
+		"typescript",
+		"javascript",
+		"app",
+		"application",
+		"framework",
+		"context",
+		"middleware",
+		"async"
+	],
+	"license": "MIT",
+	"author": "https://github.com/contexted-js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/contexted-js/core.git"
+	}
+}
