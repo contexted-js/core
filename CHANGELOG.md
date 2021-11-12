@@ -7,6 +7,15 @@
 
 ---
 
+## [0.2.0] - 2021-11-12
+
+### 🆕 Added
+
+-   🔡 Middlewares and main class
+-   🔡 Test environment (Updates won't be listed here)
+
+---
+
 ## [0.1.0] - 2021-11-12
 
 ### 🆕 Added
