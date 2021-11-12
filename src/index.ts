@@ -1,31 +1,40 @@
-export type Middleware<ContextType> = (
-	context: ContextType
+export type Middleware<ContextType, InjectablesType> = (
+	context: ContextType,
+	...injectables: InjectablesType[]
 ) => any | Promise<any>;
 
-export type Route<ContextType, TestType> = {
+export type Stream<ContextType, InjectablesType> = (
+	| Middleware<ContextType, never>
+	| {
+			middleware: Middleware<ContextType, InjectablesType>;
+			injectables: InjectablesType[];
+	  }
+)[];
+
+export type Route<ContextType, TestType, InjectablesType> = {
 	test: TestType[];
-	middlewares: Middleware<ContextType>[];
+	middlewares: Stream<ContextType, InjectablesType>;
 };
 
-export interface Driver<ContextType, TestType> {
-	subscribe(route: Route<ContextType, TestType>): Function;
+export interface Driver<ContextType, TestType, InjectablesType> {
+	subscribe(route: Route<ContextType, TestType, InjectablesType>): Function;
 }
 
-export class Contexted<ContextType, TestType> {
+export class Contexted<ContextType, TestType, InjectablesType> {
 	private registeredRoutes: {
-		route: Route<ContextType, TestType>;
+		route: Route<ContextType, TestType, InjectablesType>;
 		unsubscriber: Function;
 	}[];
 
 	constructor(
-		private driver: Driver<ContextType, TestType>,
-		routes: Route<ContextType, TestType>[] = []
+		private driver: Driver<ContextType, TestType, InjectablesType>,
+		routes: Route<ContextType, TestType, InjectablesType>[] = []
 	) {
 		this.registeredRoutes = [];
 		for (const route of routes) this.registerRoute(route);
 	}
 
-	public registerRoute(route: Route<ContextType, TestType>) {
+	public registerRoute(route: Route<ContextType, TestType, InjectablesType>) {
 		const unsubscriber = this.driver.subscribe(route);
 		if (unsubscriber)
 			this.registeredRoutes.push({
@@ -34,7 +43,7 @@ export class Contexted<ContextType, TestType> {
 			});
 	}
 
-	public unregisterRoute(route: Route<ContextType, TestType>) {
+	public unregisterRoute(route: Route<ContextType, TestType, InjectablesType>) {
 		for (const registeredRoute of this.registeredRoutes)
 			if (registeredRoute.route === route) {
 				registeredRoute.unsubscriber();
