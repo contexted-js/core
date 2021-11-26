@@ -1,60 +1,72 @@
-export type Middleware<ContextType, InjectablesType> = (
+export type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
+
+export type Middlware<ContextType, InjectablesType> = (
 	context: ContextType,
 	...injectables: InjectablesType[]
-) => any | Promise<any>;
+) => AsyncReturn<ContextType>;
 
-export type Stream<ContextType, InjectablesType> = (
-	| Middleware<ContextType, never>
-	| {
-			middleware: Middleware<ContextType, InjectablesType>;
-			injectables: InjectablesType[];
-	  }
-)[];
+export type ContextTransformer<InputType, TargetType> = (
+	input: InputType
+) => AsyncReturn<TargetType>;
 
-export type Route<ContextType, TestType, InjectablesType> = {
-	test: TestType[];
-	middlewares: Stream<ContextType, InjectablesType>;
+export type Route<TestType, ContextType, InjectablesType> = {
+	test: TestType;
+	middlewares: {
+		middleware: Middlware<ContextType, InjectablesType>;
+		injectables?: InjectablesType[];
+	}[];
 };
 
-export interface Driver<ContextType, TestType, InjectablesType> {
-	subscribe(route: Route<ContextType, TestType, InjectablesType>): Function;
-}
+export type Subscriber<TestType, RequestType, ResponseType> = (
+	test: TestType,
+	handler: (request: RequestType) => AsyncReturn<ResponseType>
+) => () => AsyncReturn<boolean>;
 
-export class Contexted<ContextType, TestType, InjectablesType> {
-	private registeredRoutes: {
-		route: Route<ContextType, TestType, InjectablesType>;
-		unsubscriber: Function;
-	}[];
+export type ContextedConfiguration<
+	TestType,
+	ContextType,
+	RequestType,
+	ResponseType
+> = {
+	subscriber: Subscriber<TestType, RequestType, ResponseType>;
+	contextGenerator?: ContextTransformer<RequestType, ContextType>;
+	responseGenerator?: ContextTransformer<ContextType, ResponseType>;
+};
 
+export class Contexted<
+	TestType,
+	ContextType,
+	InjectablesType,
+	RequestType,
+	ResponseType
+> {
 	constructor(
-		private driver: Driver<ContextType, TestType, InjectablesType>,
-		routes: Route<ContextType, TestType, InjectablesType>[] = []
+		private configuration: ContextedConfiguration<
+			TestType,
+			ContextType,
+			RequestType,
+			ResponseType
+		>
 	) {
-		this.registeredRoutes = [];
-		for (const route of routes) this.registerRoute(route);
+		this.configuration.contextGenerator ||= (request) => request as any;
+		this.configuration.responseGenerator ||= (context) => context as any;
 	}
 
-	public registerRoute(route: Route<ContextType, TestType, InjectablesType>) {
-		const unsubscriber = this.driver.subscribe(route);
-		if (unsubscriber)
-			this.registeredRoutes.push({
-				route,
-				unsubscriber,
-			});
-	}
-
-	public unregisterRoute(route: Route<ContextType, TestType, InjectablesType>) {
-		for (const registeredRoute of this.registeredRoutes)
-			if (registeredRoute.route === route) {
-				registeredRoute.unsubscriber();
-				this.registeredRoutes = this.registeredRoutes.splice(
-					this.registeredRoutes.indexOf(registeredRoute),
-					1
-				);
+	registerRoute(route: Route<TestType, ContextType, InjectablesType>) {
+		return this.configuration.subscriber(route.test, async (request) => {
+			try {
+				let context = await this.configuration.contextGenerator(request);
+	
+				for (const middleware of route.middlewares)
+					context = await middleware.middleware(
+						context,
+						...(middleware.injectables || [])
+					);
+	
+				return await this.configuration.responseGenerator(context);
+			} catch (error) {
+				throw error;
 			}
-	}
-
-	public getRegisteredRoutes() {
-		return this.registeredRoutes;
+		});
 	}
 }
