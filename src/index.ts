@@ -22,6 +22,35 @@ export type Subscriber<TestType, RequestType, ResponseType> = (
 	handler: (request: RequestType) => AsyncReturn<ResponseType>
 ) => () => AsyncReturn<boolean>;
 
+export function registerRoute<
+	TestType,
+	ContextType,
+	InjectablesType,
+	RequestType,
+	ResponseType
+>(
+	subscriber: Subscriber<TestType, RequestType, ResponseType>,
+	route: Route<TestType, ContextType, InjectablesType>,
+	contextGenerator: ContextTransformer<RequestType, ContextType>,
+	responseGenerator: ContextTransformer<ContextType, ResponseType>
+) {
+	return subscriber(route.test, async (request) => {
+		try {
+			let context = await contextGenerator(request);
+
+			for (const middleware of route.middlewares)
+				context = await middleware.middleware(
+					context,
+					...(middleware.injectables || [])
+				);
+
+			return await responseGenerator(context);
+		} catch (error) {
+			throw error;
+		}
+	});
+}
+
 export type ContextedConfiguration<
 	TestType,
 	ContextType,
@@ -53,20 +82,11 @@ export class Contexted<
 	}
 
 	registerRoute(route: Route<TestType, ContextType, InjectablesType>) {
-		return this.configuration.subscriber(route.test, async (request) => {
-			try {
-				let context = await this.configuration.contextGenerator(request);
-	
-				for (const middleware of route.middlewares)
-					context = await middleware.middleware(
-						context,
-						...(middleware.injectables || [])
-					);
-	
-				return await this.configuration.responseGenerator(context);
-			} catch (error) {
-				throw error;
-			}
-		});
+		return registerRoute(
+			this.configuration.subscriber,
+			route,
+			this.configuration.contextGenerator,
+			this.configuration.responseGenerator
+		);
 	}
 }

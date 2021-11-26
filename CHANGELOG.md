@@ -17,6 +17,14 @@
 
 ---
 
+## [0.5.0] - 2021-11-26
+
+### Added
+
+-   Exported registerRoute function for functional use
+
+---
+
 ## [0.4.0] - 2021-11-26
 
 ### Added

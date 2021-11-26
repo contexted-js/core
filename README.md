@@ -22,9 +22,11 @@
     - [Subscriber](#subscriber)
     - [Route](#route)
 - [Usage](#usage)
+    - [Functional](#functional)
     - [OOP](#oop)
 - [API Reference](#api-reference)
     - [Types](#types)
+    - [Functions](#functions)
     - [Constructors](#constructors)
 
 ## Introduction
@@ -150,9 +152,28 @@ const customRoute = {
 
 ## Usage
 
+### Functional
+
+Contexted module exports a **registerRoute** function. It receives a subscriber, a route, a context generator and a response generator and will make the proper request handler and register it to your driver. It is expected to return an unsubscribe function.
+
+Example:
+
+```ts
+import { registerRoute } from '@Contexted/Core';
+
+const customDriver = new CustomDriver();
+
+const customRouteUnsubscribeFunction = registerRoute(
+	(test, handler) => customDriver.subscribe(test, handler),
+	customRoute,
+	customContextGenerator,
+	customResponseGenerator
+);
+```
+
 ### OOP
 
-Contexted exports a class. You can construct it with custom driver and generators and works more easily with routes.
+Contexted exports a wrapper class as well. You can construct it with custom driver and generators and works more easily with routes.
 
 Example:
 
@@ -205,6 +226,23 @@ type ContextedConfiguration<TestType, ContextType, RequestType, ResponseType> =
 		contextGenerator?: ContextTransformer<RequestType, ContextType>;
 		responseGenerator?: ContextTransformer<ContextType, ResponseType>;
 	};
+```
+
+### Functions
+
+```ts
+function registerRoute<
+	TestType,
+	ContextType,
+	InjectablesType,
+	RequestType,
+	ResponseType
+>(
+	subscriber: Subscriber<TestType, RequestType, ResponseType>,
+	route: Route<TestType, ContextType, InjectablesType>,
+	contextGenerator: ContextTransformer<RequestType, ContextType>,
+	responseGenerator: ContextTransformer<ContextType, ResponseType>
+) => Function;
 ```
 
 ### Constructors
