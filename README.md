@@ -18,7 +18,7 @@
     - [Summary](#summary)
 - [Concepts](#concepts)
     - [Middleware](#middleware)
-	- [Context and Response Generator](#context-and-response-generator)
+	- [Context and Response Generators](#context-and-response-Generators)
     - [Subscriber](#subscriber)
     - [Route](#route)
 - [Usage](#usage)
@@ -63,7 +63,7 @@ const customMiddleware = (context: CustomContext, injectedDate: Date) => {
 };
 ```
 
-### Context/Response Generator
+### Context and Response Generators
 
 Functions that will generate context wit request, or response with context.
 
