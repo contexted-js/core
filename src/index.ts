@@ -5,7 +5,7 @@ export type Middlware<ContextType, InjectablesType> = (
 	...injectables: InjectablesType[]
 ) => AsyncReturn<ContextType>;
 
-export type ContextTransformer<InputType, TargetType> = (
+export type Generator<InputType, TargetType> = (
 	input: InputType
 ) => AsyncReturn<TargetType>;
 
@@ -31,8 +31,8 @@ export function registerRoute<
 >(
 	subscriber: Subscriber<TestType, RequestType, ResponseType>,
 	route: Route<TestType, ContextType, InjectablesType>,
-	contextGenerator: ContextTransformer<RequestType, ContextType>,
-	responseGenerator: ContextTransformer<ContextType, ResponseType>
+	contextGenerator: Generator<RequestType, ContextType>,
+	responseGenerator: Generator<ContextType, ResponseType>
 ) {
 	return subscriber(route.test, async (request) => {
 		try {
@@ -58,8 +58,8 @@ export type ContextedConfiguration<
 	ResponseType
 > = {
 	subscriber: Subscriber<TestType, RequestType, ResponseType>;
-	contextGenerator?: ContextTransformer<RequestType, ContextType>;
-	responseGenerator?: ContextTransformer<ContextType, ResponseType>;
+	contextGenerator?: Generator<RequestType, ContextType>;
+	responseGenerator?: Generator<ContextType, ResponseType>;
 };
 
 export class Contexted<

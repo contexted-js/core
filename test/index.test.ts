@@ -1,4 +1,4 @@
-import type { ContextTransformer } from '../dist';
+import type { Generator } from '../dist';
 import { Contexted } from '../dist';
 
 type Context = {
@@ -39,11 +39,11 @@ class Driver {
 
 const driver = new Driver();
 
-const contextGenerator: ContextTransformer<string, Context> = (request) => ({
+const contextGenerator: Generator<string, Context> = (request) => ({
 	request,
 });
 
-const responseGenerator: ContextTransformer<Context, string[]> = (context) => [
+const responseGenerator: Generator<Context, string[]> = (context) => [
 	...(context.response || []),
 	'done',
 ];
@@ -122,7 +122,7 @@ test('Reverse route with "teststring" as input data.', async () =>
 	]));
 
 test('Reverse route call after unsubscribing.', async () => {
-	unsubscribe();
+	await unsubscribe();
 	expect(await driver.emit('reverse', 'teststring')).toBeNull();
 });
 
