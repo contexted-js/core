@@ -20,5 +20,5 @@
 
 ## Methods
 
--   [Functional](usage/functional.md)
--   [Object Oriented](usage/object-oriented.md)
+-   [Functional](functional.md)
+-   [Object Oriented](object-oriented.md)
