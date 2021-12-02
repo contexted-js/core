@@ -22,7 +22,7 @@
 
 Contexted is written in [TypeScript](https://www.typescriptlang.org/), and requires [NodeJS](https://nodejs.org/) to work. You can download NodeJS from here:
 
-[NodeJS Downloads](https://node.js.org/en/download/)
+[NodeJS Downloads](https://nodejs.org/en/download/)
 
 To confirm that you have NodeJS and NPM installed on your machine, run following commands inside command line:
 

@@ -14,7 +14,7 @@
 
 ---
 
-[**Documentation**](../../) > [**Concepts**](../) > **Generators**
+[**Documentation**](../) > [**Concepts**](README.md) > **Generators**
 
 ---
 

@@ -14,7 +14,7 @@
 
 ---
 
-[**Documentation**](../../) > [**Usage**](../) > **Functional**
+[**Documentation**](../) > [**Usage**](README.md) > **Functional**
 
 ---
 
