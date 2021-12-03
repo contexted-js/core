@@ -36,10 +36,11 @@
 
 ## Table of Contents
 
--   [Documentations](documentations)
--   [Version History](version-history)
--   [Contributing](contributing)
--   [License](license)
+-   [Overview](#overview)
+-   [Documentations](#documentations)
+-   [Version History](#version-history)
+-   [Contributing](#contributing)
+-   [License](#license)
 
 ## Overview
 
