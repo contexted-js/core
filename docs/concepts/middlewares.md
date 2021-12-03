@@ -20,11 +20,11 @@
 
 ### Contexts
 
-Simply put, **Contexts** are state-holder data units. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they can also be shared between different data processors.
+Simply put, contexts are state-holder data units. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they can also be shared between different data processors.
 
 ### Middlewares
 
-**Middlewares**, small software units that will make your project work, are the very basic logic units of a Contexted application.<br />
+Middlewares, small software units that will make your project work, are the very basic logic units of a Contexted application.<br />
 A middleware is a function that receives a context, and may receive a set of injected objects, and is expected to return a context with the same type as input context:
 
 ```ts

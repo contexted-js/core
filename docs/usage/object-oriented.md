@@ -50,7 +50,7 @@ class Contexted<Test, Context, Injectables, Request, Response> {
 Piece of cake:
 
 ```ts
-import { Contexted } from '@Contexted/Core';
+import { Contexted } from '@contexted/core';
 
 const application = new Contexted({
 	subscriber,
@@ -58,13 +58,13 @@ const application = new Contexted({
 	responseGenerator,
 });
 
-const unsubscriber = application.registerRoute(route);
+const unsubscriber = await application.registerRoute(route);
 ```
 
 Another example with a constructed driver and without a context generator:
 
 ```ts
-import { Contexted } from '@Contexted/Core';
+import { Contexted } from '@contexted/core';
 
 const driver = new CustomDriver();
 
@@ -74,5 +74,5 @@ const application = new Contexted({
 	responseGenerator,
 });
 
-application.registerRoute(route);
+await application.registerRoute(route);
 ```

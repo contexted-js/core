@@ -42,7 +42,7 @@ const echoGenerator: Generator<Input, Output> = (input: Input) => input as any;
 Pretty straightforward:
 
 ```ts
-import { registerRoute } from '@Contexted/Core';
+import { registerRoute } from '@contexted/core';
 
 const unsubscriber = registerRoute(
 	subscriber,

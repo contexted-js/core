@@ -60,20 +60,6 @@ const application = new Contexted<
 	responseGenerator,
 });
 
-const unsubscribe = application.registerRoute({
-	test: 'reverse',
-	middlewares: [
-		{
-			middleware: (context) => {
-				context.response = [
-					context.request.split('').reverse().join(''),
-				];
-				return context;
-			},
-		},
-	],
-});
-
 application.registerRoute({
 	test: 'replace',
 	middlewares: [
@@ -115,13 +101,26 @@ application.registerRoute({
 	],
 });
 
-test('Reverse route with "teststring" as input data.', async () =>
+test('Subscribe and unsubscribing Reverse route with "teststring" as input data.', async () => {
+	const unsubscribe = await application.registerRoute({
+		test: 'reverse',
+		middlewares: [
+			{
+				middleware: (context) => {
+					context.response = [
+						context.request.split('').reverse().join(''),
+					];
+					return context;
+				},
+			},
+		],
+	});
+
 	expect(await driver.emit('reverse', 'teststring')).toStrictEqual([
 		'gnirtstset',
 		'done',
-	]));
+	]);
 
-test('Reverse route call after unsubscribing.', async () => {
 	await unsubscribe();
 	expect(await driver.emit('reverse', 'teststring')).toBeNull();
 });

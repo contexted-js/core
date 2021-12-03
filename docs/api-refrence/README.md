@@ -20,28 +20,31 @@
 
 ```ts
 type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
-
-type Generator<InputType, TargetType> = (
-	input: InputType
-) => AsyncReturn<TargetType>;
+type UnsubscribeFunction = () => AsyncReturn<boolean>;
 
 type Middlware<Context, Injectables> = (
 	context: Context,
 	...injectables: Injectables[]
 ) => AsyncReturn<Context>;
 
+type Stream<ContextType, InjectablesType = never> = {
+	middleware: Middlware<ContextType, InjectablesType>;
+	injectables?: InjectablesType[];
+}[];
+
 type Route<Test, Context, Injectables> = {
 	test: Test;
-	middlewares: {
-		middleware: Middlware<Context, Injectables>;
-		injectables?: Injectables[];
-	}[];
+	middlewares: Stream[];
 };
 
 type Subscriber<Test, Request, Response> = (
 	test: Test,
 	handler: (request: Request) => AsyncReturn<Response>
-) => () => AsyncReturn<boolean>;
+) => AsyncReturn<UnsubscribeFunction>;
+
+type Generator<InputType, TargetType> = (
+	input: InputType
+) => AsyncReturn<TargetType>;
 
 type ContextedConfiguration<TestType, ContextType, RequestType, ResponseType> =
 	{
@@ -63,8 +66,8 @@ function registerRoute<
 >(
 	subscriber: Subscriber<TestType, RequestType, ResponseType>,
 	route: Route<TestType, ContextType, InjectablesType>,
-	contextGenerator: ContextTransformer<RequestType, ContextType>,
-	responseGenerator: ContextTransformer<ContextType, ResponseType>
+	contextGenerator?: ContextTransformer<RequestType, ContextType>,
+	responseGenerator?: ContextTransformer<ContextType, ResponseType>
 ) => Function;
 ```
 

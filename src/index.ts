@@ -1,4 +1,5 @@
 export type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
+export type UnsubscribeFunction = () => AsyncReturn<boolean>;
 
 export type Middlware<ContextType, InjectablesType = never> = (
 	context: ContextType,
@@ -22,7 +23,7 @@ export type Route<TestType, ContextType, InjectablesType = never> = {
 export type Subscriber<TestType, RequestType, ResponseType> = (
 	test: TestType,
 	handler: (request: RequestType) => AsyncReturn<ResponseType>
-) => () => AsyncReturn<boolean>;
+) => AsyncReturn<UnsubscribeFunction>;
 
 export function registerRoute<
 	TestType,
