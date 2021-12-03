@@ -5,7 +5,7 @@
   </p>
   <p>
     Abstract TypeScript application framework.<br />
-    Thanks to abstract design, generic typings, and middleware based architecture, <b>Migration</b>, <b>Maintenance</b>, and going <b>Modular</b> are just pieces of cake. 🍰
+    Thanks to abstract design, generic typings, and middlewar-based architecture, <b>Migration</b>, <b>Maintenance</b>, and going <b>Modular</b> are just pieces of cake. 🍰
   </p>
   <p>
     <img alt="Package name badge" src="https://img.shields.io/github/package-json/name/contexted-js/core">
@@ -44,7 +44,7 @@
 
 ## Overview
 
-**Contexted** is an abstract middleware-based JavaScript/TypeScript application framework. Thanks to its abstract design you can separate your context used by middlewares, and request or response types required by your infrastructure (NodeJS, STD, JavaScript, Native App Frameworks, etc), so you can change your whole infrastructure without touching your middlewares, and write infrastructural modules or middlewares once, and use them easily in another project.
+**Contexted** is an abstract middleware-based JavaScript/TypeScript application framework. Due to its abstract design, you can separate your context used by middlewares, and request or response types required by your infrastructure (NodeJS, STD, JavaScript, Native App Frameworks, etc), so you can change your whole infrastructure without touching your middlewares, and write infrastructural modules or middlewares once, and use them easily in another project.
 
 ## Documentations
 

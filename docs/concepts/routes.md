@@ -1,5 +1,5 @@
 <div align="center">
-    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
+    <img alt="Contexted Logo" width="64" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
