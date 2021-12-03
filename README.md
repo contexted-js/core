@@ -44,7 +44,7 @@
 
 ## Overview
 
-**Contexted** is an abstract middleware-based JavaScript/TypeScript application framework. Due to its abstract design, you can separate your context used by middlewares, and request or response types required by your infrastructure (NodeJS, STD, JavaScript, Native App Frameworks, etc), so you can change your whole infrastructure without touching your middlewares, and write infrastructural modules or middlewares once, and use them easily in another project.
+**Contexted** is an abstract middleware-based JavaScript/TypeScript application framework. Due to its abstract design, you can separate your context used by middlewares, and request or response objects used by your infrastructure (NodeJS, STD, JavaScript, Native App Frameworks, etc), so you can change your whole infrastructure without touching your middlewares, and write infrastructural modules or middlewares once, and use them easily in another project.
 
 ## Documentations
 
