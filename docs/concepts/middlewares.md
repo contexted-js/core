@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
@@ -92,11 +92,15 @@ const loginMiddleware = (
 ) => {
 	const user = $database.get(context.request.body?.username);
 
-	if (!user) context.response.status = 404;
-	else {
+	if (!user) {
+		context.response.status = 404;
+		context.response.body = 'user not found';
+	} else {
 		context.response.status = 200;
 		context.response.headers = { 'Content-Type': 'application/json' };
 		context.response.body = JSON.stringify({ user });
 	}
+
+	return context;
 };
 ```

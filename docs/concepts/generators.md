@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
@@ -56,6 +56,8 @@ const responseGenerator: Generator<JSON, string> = JSON.parse;
 But by getting a little bit closer to real world, you'll feel the magic better:
 
 ```ts
+import { IncomingMessage } from 'http';
+
 type CustomContext = {
 	readonly request: {
 		route: string;
@@ -69,22 +71,26 @@ type CustomContext = {
 	};
 };
 
-const contextGenerator: Generator<IncomingMessage, CustomContext> = (
-	request
-) => ({
-	request: {
-		route: request.url,
-		method: request.method,
-		body: request.body,
-	},
-	response: { status: 404 },
-});
+type CustomResponse = {
+	status: number;
+	headers: { [key: string]: string | string[] };
+	body?: string;
+};
 
-const responseGenerator: Generator<CustomContext, ServerResponse> = (
-	context
-) => ({
-	status: context.response.status,
-	headers: [{ 'Content-Type': context.response.mime }],
-	body: context.response.body,
-});
+const contextGenerator = (request: IncomingMessage) =>
+	<CustomContext>{
+		request: {
+			route: request.url,
+			method: request.method,
+			body: request.body,
+		},
+		response: { status: 404 },
+	};
+
+const responseGenerator = (context: CustomContext) =>
+	<CustomResponse>{
+		status: context.response.status,
+		headers: [{ 'Content-Type': context.response.mime }],
+		body: context.response.body,
+	};
 ```

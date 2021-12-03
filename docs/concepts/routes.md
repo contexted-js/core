@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
@@ -20,17 +20,25 @@
 
 ## Explain
 
-### Routes
+### Streams
 
-**Routes** are objects that define what middlewares should be executed, injected with what objects, and when what test case happens:
+Streams are an array of middlewares, with their required injectable objects:
 
 ```ts
-type Route<Test, Context, Injectables> = {
+type Stream<Context, Injectables = never> = {
+	middleware: Middlware<Context, Injectables>;
+	injectables?: Injectables[];
+}[];
+```
+
+### Routes
+
+**Routes** are objects that define which steam should be executed when which test case happens:
+
+```ts
+type Route<Test, Context, Injectables = never> = {
 	test: Test;
-	middlewares: {
-		middleware: Middlware<Context, Injectables>;
-		injectables?: Injectables[];
-	}[];
+	middlewares: Stream<Context, Injectables>;
 };
 ```
 
@@ -39,9 +47,10 @@ type Route<Test, Context, Injectables> = {
 Here's a very simple route, which only has one middleware, without any injectables:
 
 ```ts
+const echoStream = [{ middleware: echoMiddleware }];
 const echoRoute = {
     test: 'echo',
-    middlewares: [{ middleware: echoMiddleware }]
+    middlewares: echoStream
 }
 ```
 

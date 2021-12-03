@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
@@ -20,7 +20,7 @@
 
 ## Explain
 
-Contexted exports a function named registerRoute. It generates a handler functio, and subscribes it:
+Contexted exports a function named registerRoute. It generates a handler function, and subscribes it:
 
 ```ts
 type UnsubscribeFunction = () => boolean | Promise<boolean>;
@@ -28,9 +28,15 @@ type UnsubscribeFunction = () => boolean | Promise<boolean>;
 function registerRoute<Test, Context, Injectables, Request, Response>(
 	subscriber: Subscriber<Test, Request, Response>,
 	route: Route<Test, Context, Injectables>,
-	contextGenerator: Generator<Request, Context>,
-	responseGenerator: Generator<Context, Response>
+	contextGenerator?: Generator<Request, Context>,
+	responseGenerator?: Generator<Context, Response>
 ): UnsubscribeFunction;
+```
+
+If you don't provide any generators, it'll just use an echo generator instead:
+
+```ts
+const echoGenerator: Generator<Input, Output> = (input: Input) => input as any;
 ```
 
 ## Examples
@@ -41,9 +47,9 @@ Pretty straightforward:
 import { registerRoute } from '@Contexted/Core';
 
 const unsubscriber = registerRoute(
-    subscriber,
-    route,
-    contextGenerator,
-    responseGenerator
+	subscriber,
+	route,
+	contextGenerator,
+	responseGenerator
 );
 ```

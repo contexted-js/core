@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <h1>
 		<a href="https://github.com/contexted-js/core">
         	@Contexted/Core
@@ -15,10 +15,6 @@
 **Documentation**
 
 ---
-
-## Overview
-
-Contexted is an abstract application framework that uses a simple context-based architecture. You can use any driver (NodeJS, STD, JavaScript, Native App Frameworks, etc), any request to context, and context to response transformer and use their generic types to separate infrastructure from logic and build cross-environment middlewares.
 
 ## Table of Contents
 

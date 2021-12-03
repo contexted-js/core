@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
@@ -40,7 +40,7 @@ This subscriber will subscribe your route to a a very simple event emitter.
 ```ts
 const routes = {};
 
-function subscriberFunction: Subscriber<string, string, string>(test, handler) {
+function subscriberFunction {
 	if (routes[test]) return null;
 	routes[test] = handler;
 	return () => delete routes[test];

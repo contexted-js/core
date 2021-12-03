@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main.svg">
+    <img alt="Contexted Logo" width="128" src="https://raw.githubusercontent.com/contexted-js/brand/master/dark/main-fill.svg">
     <br />
     <br />
     <h1>
@@ -20,7 +20,7 @@
 
 ## Explain
 
-Exported registerRoute is wrapped in a helper class as well:
+Exported registerRoute is wrapped in a helper class as well. It asks for a subcriber and optinal generators to keep and use them for registerRoute function:
 
 ```ts
 type UnsubscribeFunction = () => boolean | Promise<boolean>;
@@ -55,10 +55,26 @@ Piece of cake:
 import { Contexted } from '@Contexted/Core';
 
 const application = new Contexted({
-    subscriber,
-    contextGenerator,
-    responseGenerator
+	subscriber,
+	contextGenerator,
+	responseGenerator,
 });
 
 const unsubscriber = application.registerRoute(route);
+```
+
+Another example with a constructed driver and without a context generator:
+
+```ts
+import { Contexted } from '@Contexted/Core';
+
+const driver = new CustomDriver();
+
+const application = new Contexted({
+	subscriber: (test, handler) => driver.subscribe(test, handler),
+	null,
+	responseGenerator,
+});
+
+application.registerRoute(route);
 ```
