@@ -28,7 +28,7 @@ type Generator<InputType, TargetType> = (
 ) => AsyncReturn<TargetType>;
 ```
 
-Contexted will ask you for two generators, to generate context from request, and response from context.
+Contexted will ask you for two generators, to generate context from request, and response from context:
 
 ### Context Generator
 

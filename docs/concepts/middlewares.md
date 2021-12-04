@@ -28,7 +28,7 @@ Middlewares, small software units that will make your project work, are the very
 A middleware is a function that receives a context, and may receive a set of injected objects, and is expected to return a context with the same type as input context:
 
 ```ts
-type Middlware<Context, Injectables> = (
+type Middleware<Context, Injectables> = (
 	context: Context,
 	...injectables: Injectables[]
 ) => Context | Promise<Context>;

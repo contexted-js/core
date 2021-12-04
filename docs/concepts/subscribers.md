@@ -33,7 +33,7 @@ type Subscriber<Test, Request, Response> = (
 
 ## Examples
 
-This subscriber will subscribe your route to a a very simple event emitter.
+This subscriber will subscribe your route to a a very simple event emitter:
 
 ```ts
 const routes = {};

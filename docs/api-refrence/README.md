@@ -22,13 +22,13 @@
 type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
 type UnsubscribeFunction = () => AsyncReturn<boolean>;
 
-type Middlware<Context, Injectables> = (
+type Middleware<Context, Injectables> = (
 	context: Context,
 	...injectables: Injectables[]
 ) => AsyncReturn<Context>;
 
 type Stream<ContextType, InjectablesType = never> = {
-	middleware: Middlware<ContextType, InjectablesType>;
+	middleware: Middleware<ContextType, InjectablesType>;
 	injectables?: InjectablesType[];
 }[];
 

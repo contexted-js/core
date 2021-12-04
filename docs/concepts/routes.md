@@ -24,7 +24,7 @@ Streams are an array of middlewares, with their required injectable objects:
 
 ```ts
 type Stream<Context, Injectables = never> = {
-	middleware: Middlware<Context, Injectables>;
+	middleware: Middleware<Context, Injectables>;
 	injectables?: Injectables[];
 }[];
 ```

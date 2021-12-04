@@ -1,7 +1,7 @@
 export type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
 export type UnsubscribeFunction = () => AsyncReturn<boolean>;
 
-export type Middlware<ContextType, InjectablesType = never> = (
+export type Middleware<ContextType, InjectablesType = never> = (
 	context: ContextType,
 	...injectables: InjectablesType[]
 ) => AsyncReturn<ContextType>;
@@ -11,7 +11,7 @@ export type Generator<DataType, OutputType> = (
 ) => AsyncReturn<OutputType>;
 
 export type Stream<ContextType, InjectablesType = never> = {
-	middleware: Middlware<ContextType, InjectablesType>;
+	middleware: Middleware<ContextType, InjectablesType>;
 	injectables?: InjectablesType[];
 }[];
 

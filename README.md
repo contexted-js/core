@@ -5,7 +5,7 @@
   </p>
   <p>
     Abstract TypeScript application framework.<br />
-    Thanks to abstract design, generic typings, and middlewar-based architecture, <b>Migration</b>, <b>Maintenance</b>, and going <b>Modular</b> are just pieces of cake. 🍰
+    Thanks to abstract design, generic typings, and middleware-based architecture, <b>Migration</b>, <b>Maintenance</b>, and going <b>Modular</b> are just pieces of cake. 🍰
   </p>
   <p>
     <img alt="Package name badge" src="https://img.shields.io/github/package-json/name/contexted-js/core">
