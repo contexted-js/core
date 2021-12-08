@@ -12,66 +12,96 @@
 
 ---
 
-[**Documentation**](../) > [**Concepts**](README.md) > **Middleware**
+[**Documentation**](../README.md) > [**Concepts**](README.md) > **Middleware**
 
 ---
 
 ## Explain
 
-### Contexts
-
-Simply put, contexts are state-holder data units. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they can also be shared between different data processors.
-
 ### Middlewares
 
-Middlewares, small software units that will make your project work, are the very basic logic units of a Contexted application.<br />
-A middleware is a function that receives a context, and may receive a set of injected objects, and is expected to return a context with the same type as input context:
+Middlewares are the very basic logic units of a Contexted application.
+
+A `Middleware` is an asynchronous or synchronous function that receives a context and may receive a set of injected objects, and will be used to process the context:
 
 ```ts
-type Middleware<Context, Injectables> = (
-	context: Context,
+import type { AsyncReturn, Context } from '@contexted/core';
+
+type Middleware<
+	MiddlewareContext extends Context,
+	Injectables = any,
+	ImmutableContext = false
+> = (
+	context: MiddlewareContext,
 	...injectables: Injectables[]
-) => Context | Promise<Context>;
+) => AsyncReturn<ImmutableContext extends true ? ContextType : any>;
 ```
+
+### Mutability
+
+As mentioned in [Wikipedia](https://en.wikipedia.org/wiki/Immutable_object), an immutable object (unchangeable object) is an object whose state cannot be modified after it is created. Contexted middlewares support optional context immutability.
+
+### Context Mutable Middlewares
+
+When using context mutable middlewares, you make changes to your context and the same changed object will be passed to the next middleware (If the `next` flag is not `false` of course :D) and any returned value by middleware will be ignored by Contexted.
+
+### Context Immutable Middlewares
+
+Context immutable middlewares, on the other hand, are expected to return a context object. The returned object will be passed to the next middleware.
 
 ## Examples
 
-This is a simple echo middleware:
+First, let's look at this simple reverse middleware:
 
 ```ts
-function echoMiddleware(context: string) {
+import type { Middleware } from '@contexted/core';
+
+type Context = {
+	content: string;
+	next: boolean;
+};
+
+function mutableReverseMiddleware(context): Middleware<Context> {
+	context.content = context.content.split('').reverse().join('');
+}
+
+function immutableReverseMiddleware(context): Middleware<Context, never, true> {
+	context.content = context.content.split('').reverse().join('');
 	return context;
 }
 ```
 
-Which we also know as:
+Now by using a more complex context structure, you can separate your input/output data:
 
 ```ts
-echoMiddleware = (context: string) => context;
-```
+import type { Middleware, Context } from '@contexted/core';
 
-bby using a more complex context structure, you can seprate your input/output data:
-
-```ts
-type CustomContext = {
+type StringContext = Context & {
 	readonly request: string;
 	response: string;
 };
 
-const reverseMiddleware = (context: CustomContext) => ({
-	request: context.request,
-	response: context.request.split('').reverse().join(''),
+const mutableReverseMiddleware: Middleware<StringContext> = (context) =>
+	(context.response = request.split('').reverse().join(''));
+
+const immutableReverseMiddleware: Middleware<Context, never, true> = ({
+	request,
+	response,
+}) => ({
+	request,
+	response: request.split('').reverse().join(''),
+	next: true,
 });
 ```
 
-Following example - a simple login server - gives you a more realistic view on middlewares in action:
+This simple login server example gives you a more realistic view of middlewares in action. Notice the `next` flag:
 
 ```ts
-interface CustomDatabaseService {
-	get: (key: string) => string;
-}
+import type { Context, Middleware } from '@contexted/core';
 
-type CustomContext = {
+import type { DatabaseService } from './your-code';
+
+type HttpContext = Context & {
 	readonly request: {
 		route: string;
 		method: string;
@@ -84,21 +114,48 @@ type CustomContext = {
 	};
 };
 
-const loginMiddleware = (
-	context: CustomContext,
-	$database: CustomDatabaseService
+const mutableLoginMiddleware: Middleware<HttpContext, DatabaseService> = (
+	context,
+	$database
 ) => {
 	const user = $database.get(context.request.body?.username);
 
 	if (!user) {
 		context.response.status = 404;
 		context.response.body = 'user not found';
+		context.next = false;
 	} else {
 		context.response.status = 200;
 		context.response.headers = { 'Content-Type': 'application/json' };
 		context.response.body = JSON.stringify({ user });
 	}
-
-	return context;
 };
+
+const immutableLoginMiddleware: Middleware<HttpContext, DatabaseService, true> =
+	({ request }, $database) => {
+		const user = $database.get(request.body?.username);
+
+		return {
+			request,
+			response: user
+				? {
+						status: 200,
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ user }),
+				  }
+				: {
+						status: 404,
+						body: 'user not found',
+				  },
+			next: user ? true : false,
+		};
+	};
 ```
+
+---
+
+< Prev Page
+[Contexts](contexts.md)
+
+Next Page >
+[Routes](routes.md)

@@ -12,26 +12,36 @@
 
 ---
 
-[**Documentation**](../) > [**Usage**](README.md) > **Functional**
+[**Documentation**](../README.md) > [**Usage**](README.md) > **Functional**
 
 ---
 
 ## Explain
 
-Contexted exports a function named registerRoute. It generates a handler function, and subscribes it:
+Contexted exports a function named `subscribeRoute`. It generates a handler function and subscribes using provided subscriber:
 
 ```ts
+import type { Context, Subscriber, Route, Generator } from '@contexted/core';
+
 type UnsubscribeFunction = () => boolean | Promise<boolean>;
 
-function registerRoute<Test, Context, Injectables, Request, Response>(
+function registerRoute<
+	Test,
+	MiddlewareContext extends Context,
+	Injectables = any,
+	Request = Context,
+	Response = Request
+>(
 	subscriber: Subscriber<Test, Request, Response>,
-	route: Route<Test, Context, Injectables>,
-	contextGenerator?: Generator<Request, Context>,
-	responseGenerator?: Generator<Context, Response>
+	route: Route<Test, MiddlewareContext, Injectables, true>,
+	contextGenerator?: Generator<Request, MiddlewareContext>,
+	responseGenerator?: Generator<MiddlewareContext, Response>
 ): UnsubscribeFunction;
 ```
 
-If you don't provide any generators, it'll just use an echo generator instead:
+Notice that `subscribeRoute` function only supports [context immutable middlewares](../concepts/middlewares.md#context-immutable-middlewares).
+
+Also If you don't provide any generators, an echo generator will be used instead:
 
 ```ts
 const echoGenerator: Generator<Input, Output> = (input: Input) => input as any;
@@ -44,10 +54,25 @@ Pretty straightforward:
 ```ts
 import { registerRoute } from '@contexted/core';
 
+import {
+	subscriber,
+	immutableContextRoute,
+	contextGenerator,
+	responseGenerator,
+} from './your-code';
+
 const unsubscriber = registerRoute(
 	subscriber,
-	route,
+	immutableContextRoute,
 	contextGenerator,
 	responseGenerator
 );
 ```
+
+---
+
+< Prev Page
+[Usage](README.md)
+
+Next Page >
+[Object Oriented](object-oriented.md)

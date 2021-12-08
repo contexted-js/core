@@ -12,38 +12,53 @@
 
 ---
 
-[**Documentation**](../) > [**Usage**](README.md) > **Object Oreinted**
+[**Documentation**](../README.md) > [**Usage**](README.md) > **Object Oreinted**
 
 ---
 
 ## Explain
 
-Exported registerRoute is wrapped in a helper class as well. It asks for a subcriber and optinal generators to keep and use them for registerRoute function:
+Contexted constructor asks for subscriber and optional generators and will keep and use them for route subscriptions:
 
 ```ts
 type UnsubscribeFunction = () => boolean | Promise<boolean>;
 
-type ContextedConfiguration<Test, Context, Request, Response> = {
+type ContextedConfiguration<
+	Test,
+	MiddlewareContext extends Context,
+	Request = MiddlewareContext,
+	Response = Request
+> = {
 	subscriber: Subscriber<Test, Request, Response>;
 	contextGenerator?: Generator<Request, Context>;
 	responseGenerator?: Generator<Context, Response>;
+	immutableContext?: boolean;
 };
 
-class Contexted<Test, Context, Injectables, Request, Response> {
+class Contexted<
+	Test,
+	MiddlewareContext extends Context,
+	Injectables = any,
+	Request = MiddlewareContext,
+	Response = Request,
+	ImmutableContext = false
+> {
 	constructor(
 		private configuration: ContextedConfiguration<
 			Test,
-			Context,
+			MiddlewareContext,
 			Request,
 			Response
 		>
 	): void;
 
 	registerRoute(
-		route: Route<Test, Context, Injectables>
+		route: Route<Test, MiddlewareContext, Injectables, ImmutableContext>
 	): UnsubscribeFunction;
 }
 ```
+
+Unlike `subscribeRoute` function, `Contexted` class supports both [context mutable](../concepts/middlewares.md#context-mutable-middlewares) and [context immutable](../concepts/middlewares.md#context-immutable-middlewares) middlewares, which you can switch between using `immutableContext` flag in your configuration. It is set to `false` (context mutable) by default.
 
 ## Examples
 
@@ -52,27 +67,50 @@ Piece of cake:
 ```ts
 import { Contexted } from '@contexted/core';
 
+import {
+	subscriber,
+	contextGenerator,
+	responseGenerator,
+	mutableContextRoute,
+} from './your-code';
+
 const application = new Contexted({
 	subscriber,
 	contextGenerator,
 	responseGenerator,
 });
 
-const unsubscriber = await application.registerRoute(route);
+const unsubscriber = await application.registerRoute(mutableContextRoute);
 ```
 
-Another example with a constructed driver and without a context generator:
+Another example with a constructed driver, without a context generator and using immutable contexts:
 
 ```ts
 import { Contexted } from '@contexted/core';
 
-const driver = new CustomDriver();
+import {
+	Driver,
+	contextGenerator,
+	responseGenerator,
+	immutableContextRoute,
+} from './your-code';
+
+const driver = new Driver();
 
 const application = new Contexted({
 	subscriber: (test, handler) => driver.subscribe(test, handler),
 	null,
 	responseGenerator,
+	immutableContext: true,
 });
 
-await application.registerRoute(route);
+const unsubscriber = await application.registerRoute(immutableContextRoute);
 ```
+
+---
+
+< Prev Page
+[Functional](functional.md)
+
+Next Page >
+[API Refrence](../api-refrence.md)

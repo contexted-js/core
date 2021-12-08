@@ -12,17 +12,17 @@
 
 ---
 
-[**Documentation**](../) > **Installation**
+[**Documentation**](README.md) > **Installation**
 
 ---
 
 ## Prerequisites
 
-Contexted is written in [TypeScript](https://www.typescriptlang.org/), and requires [NodeJS](https://nodejs.org/) to work. You can download NodeJS from here:
+Contexted is written in [TypeScript](https://www.typescriptlang.org/) and requires [NodeJS](https://nodejs.org/) to work. You can download NodeJS from here:
 
 [NodeJS Downloads](https://nodejs.org/en/download/)
 
-To confirm that you have NodeJS and NPM installed on your machine, run following commands inside command line:
+To confirm that you have NodeJS and NPM installed on your machine, run the following commands inside your command line:
 
 ```sh
 node -v
@@ -36,3 +36,11 @@ Contexted core package is accessible via NPM:
 ```sh
 npm i --save @contexted/core
 ```
+
+---
+
+< Prev Page
+[Documentations](README.md)
+
+Next Page >
+[Concepts](concepts/README.md)

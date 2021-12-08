@@ -12,7 +12,7 @@
 
 ---
 
-[**Documentation**](../) > **Concepts**
+[**Documentation**](../README.md) > **Concepts**
 
 ---
 
@@ -20,15 +20,24 @@
 
 Contexted is similar to any other middleware-based application framework, with an amazing difference. By using two generators that convert requests to contexts, and contexts to responses, you can separate your infrastructure and app logic. So, migrating to another infrastructure, maintaining the existing one, and reusing all of your modules (drivers and subscribers, generators, middlewares) in other projects, are unbelievably easy.
 
--   You subscribe a set of **Middleware** functions and **Injectable** objects with a **Test Case** to a custom emitter, using a **Subscriber** function.
--   Whenever your driver meets that case, it creates a **Request**.
--   **Context Generator** function will recive request, and generates a **Context** object.
--   **Middlewares** will receive **Context** and optional **Injectable** objects in sequence.
--   Last context generated will be converted to a **Response** object by a **Response Generator** function and will be returned to driver.
+- **Middleware** functions and **Injectable** objects with a **Test Case** will be subscribed to a custom emitter, using a **Subscriber** function.
+- Whenever your driver meets that case, it creates a **Request**.
+- **Context Generator** function will receive the request and generate a **Context** object.
+- **Middlewares** will receive **Context** and optional **Injectable** objects in sequence.
+- The resulting context will be converted to a **Response** object by a **Response Generator** function and will be returned to the driver.
 
 ## Definitions
 
+-	[Contexts](contexts.md)
 -   [Middlewares](middlewares.md)
 -   [Routes](routes.md)
 -   [Generators](generators.md)
 -   [Subscribers](subscribers.md)
+
+---
+
+< Prev Page
+[Installation](../installation.md)
+
+Next Page >
+[Contexts](contexts.md)

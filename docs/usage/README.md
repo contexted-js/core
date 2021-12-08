@@ -12,11 +12,19 @@
 
 ---
 
-[**Documentation**](../) > **Usage**
+[**Documentation**](../README.md) > **Usage**
 
 ---
 
-## Methods
+## Usage Methods
 
 -   [Functional](functional.md)
 -   [Object Oriented](object-oriented.md)
+
+---
+
+< Prev Page
+[Subscribers](../concepts/subscribers.md)
+
+Next Page >
+[Functional](functional.md)

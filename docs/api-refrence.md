@@ -12,7 +12,7 @@
 
 ---
 
-[**Documentation**](../) > **API Refrence**
+[**Documentation**](README.md) > **API Refrence**
 
 ---
 
@@ -51,24 +51,8 @@ type ContextedConfiguration<TestType, ContextType, RequestType, ResponseType> =
 		subscriber: Subscriber<TestType, RequestType, ResponseType>;
 		contextGenerator?: ContextTransformer<RequestType, ContextType>;
 		responseGenerator?: ContextTransformer<ContextType, ResponseType>;
+		immutableContext?: boolean;
 	};
-```
-
-## Functions
-
-```ts
-function registerRoute<
-	TestType,
-	ContextType,
-	InjectablesType,
-	RequestType,
-	ResponseType
->(
-	subscriber: Subscriber<TestType, RequestType, ResponseType>,
-	route: Route<TestType, ContextType, InjectablesType>,
-	contextGenerator?: ContextTransformer<RequestType, ContextType>,
-	responseGenerator?: ContextTransformer<ContextType, ResponseType>
-) => Function;
 ```
 
 ## Constructors
@@ -95,3 +79,6 @@ class Contexted<
 	): Function;
 }
 ```
+
+< Prev Page
+[Object Oriented](usage/object-oriented.md)

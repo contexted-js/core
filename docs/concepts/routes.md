@@ -12,31 +12,44 @@
 
 ---
 
-[**Documentation**](../) > [**Concepts**](README.md) > **Routes**
+[**Documentation**](../README.md) > [**Concepts**](README.md) > **Routes**
 
 ---
 
 ## Explain
 
-### Streams
+### Controller
 
-Streams are an array of middlewares, with their required injectable objects:
+As mentioned in the [`Middlewares`]('middlewares.md') section, they can receive injectables. An object containing a middleware and objects to be injected is called a `Controller`:
 
 ```ts
-type Stream<Context, Injectables = never> = {
-	middleware: Middleware<Context, Injectables>;
-	injectables?: Injectables[];
-}[];
+import type { Context } from '@contexted/core';
+
+type Controller<
+	MiddlewareContext extends Context,
+	InjectablesType = any,
+	ImmutableContext = false
+> = {
+	middleware: Middleware<MiddlewareContext, InjectablesType = any, ImmutableContext = false>;
+	injectables?: InjectablesType[];
+};
 ```
 
 ### Routes
 
-**Routes** are objects that define which steam should be executed when which test case happens:
+A `Route` is an object that shows which controllers should be executed when which test case happens:
 
 ```ts
-type Route<Test, Context, Injectables = never> = {
+import type { Context } from '@contexted/core';
+
+type Route<
+	Test,
+	MiddlewareContext extends Context,
+	Injectables = any,
+	ImmutableContext = false
+> = {
 	test: Test;
-	middlewares: Stream<Context, Injectables>;
+	controllers: Controller<MiddlewareContext, Injectables, ImmutableContext>[];
 };
 ```
 
@@ -45,37 +58,70 @@ type Route<Test, Context, Injectables = never> = {
 Here's a very simple route, which only has one middleware, without any injectables:
 
 ```ts
-const echoStream = [{ middleware: echoMiddleware }];
+import type { EchoContext } from './your-code';
+
+const echoController: Controller<EchoContext> = { middleware: echoMiddleware };
 const echoRoute = {
-    test: 'echo',
-    middlewares: echoStream
-}
+	test: 'echo',
+	controllers: [echoController],
+};
 ```
 
 But this one is a bit more realistic example:
 
 ```ts
-const createContentRoute = {
+import type {
+	Test,
+	Context,
+	AuthGuard,
+	DatabaseService,
+	ContentCreateBodyScheme,
+} from './your-code';
+
+import {
+	databaseService,
+	contentCreateBodyScheme,
+	authGuardMiddleware,
+	bodyParserMiddleware,
+	bodyValidatorMiddleware,
+	addContentMiddleware,
+	apiResponseGeneratorMiddleware,
+	logMiddleware,
+} from './your-code';
+
+const createContentRoute: Route<
+	Test,
+	Context,
+	AuthGuard | DatabaseService | ContentCreateBodyScheme
+> = {
 	test: {
 		path: '/api/content',
 		method: 'POST',
 	},
-	middlewares: [
+	controllers: [
 		{
-			middleware: authGuard,
+			middleware: authGuardMiddleware,
 			injectables: [databaseService],
 		},
-		{ middleware: bodyParser },
+		{ middleware: bodyParserMiddleware },
 		{
-			middleware: bodyValidator,
+			middleware: bodyValidatorMiddleware,
 			injectables: [contentCreateBodyScheme],
 		},
 		{
-			middleware: addContent,
+			middleware: addContentMiddleware,
 			injectables: [databaseService],
 		},
-		{ middleware: apiResponseGenerator },
-		{ middleware: logService },
+		{ middleware: apiResponseGeneratorMiddleware },
+		{ middleware: logMiddleware },
 	],
 };
 ```
+
+---
+
+< Prev Page
+[Middlewares](middlewares.md)
+
+Next Page >
+[Generators](generators.md)

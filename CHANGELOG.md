@@ -16,59 +16,24 @@
 
 ---
 
-## **1.1.0** - 2021-12-04
+## **2.0.0** - 2021-12-08
 
--   Subscribe async return
+## Added
 
-## **1.0.1** - 2021-12-03
+-   Context parent type
+-   Control whether the next middleware runs using a `next` flag
+-   Optional immutability for contexts
+-   Better functional and object-oriented implementations
+-   [ES Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) support, both cjs and mjs versions available in distribution
 
--   Stable Release
+## **< 1.1.0**
 
----
+## Implemented
 
-## **0.6.0** - 2021-12-02
+-   Contexts
+-   Middlewares
+-   Routes
+-   Generators
+-   Subscribers
 
-### Added
-
--   Publish environment
-
----
-
-## **0.5.0** - 2021-11-26
-
-### Added
-
--   Exported registerRoute function for functional use
--   Constructor configuration
-
-### Updated
-
--   Constructor now wrappes extenal registerRoute function
-
----
-
-## **0.4.0** - 2021-11-26
-
-### Added
-
--   Driver Request and Response Types
--   Context and Response Generators
-
----
-
-## **0.3.0** - 2021-11-12
-
-### Added
-
--   Injectables
-
----
-
-## **0.2.0** - 2021-11-12
-
-### Added
-
--   Middlewares and Routes
--   Constructor
-
----
+For 1.1.0 and earlier changes, please check commits.

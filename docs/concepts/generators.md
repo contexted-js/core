@@ -12,51 +12,42 @@
 
 ---
 
-[**Documentation**](../) > [**Concepts**](README.md) > **Generators**
+[**Documentation**](../README.md) > [**Concepts**](README.md) > **Generators**
 
 ---
 
 ## Explain
 
-## Generators
+### Generators
 
-Contexted is an abstract framework, which means it seprates middlewares, from what triggers them. But our logic is complitly based on our logic type, and it will make it tricky to change you infrastructure (Driver, Trigger, whatever). Generators are dead simple functions that will recive an object with input type, and will return another object with output type:
+Contexted is an abstract framework, which means it separates middlewares, from what triggers them. But our logic is completely based on our logic type, and it will make it tricky to change your infrastructure (Driver, Trigger, whatever). `Generator`s are simple functions that will receive an object with input type and will return another object with output type:
 
 ```ts
 type Generator<InputType, TargetType> = (
 	input: InputType
-) => AsyncReturn<TargetType>;
+) => TargetType | Promise<TargetType>;
 ```
 
-Contexted will ask you for two generators, to generate context from request, and response from context:
-
-### Context Generator
-
-```ts
-type ContextGenerator = Generator<Reqest, Context>;
-```
-
-### Response Generator
-
-```ts
-type ContextGenerator = Generator<Context, Response>;
-```
+You can use two types of `Generator`s with Contexted, one to generate context from request, and the other to generate a response from the context.
 
 ## Examples
 
-JSON.stringify and JSON.parse are basically string/JSON generators:
+JSON.stringify and JSON.parse are technically string/JSON generators:
 
 ```ts
+import type { Generator } from '@contexted/core';
+
 const contextGenerator: Generator<string, JSON> = JSON.stringify;
 const responseGenerator: Generator<JSON, string> = JSON.parse;
 ```
 
-But by getting a little bit closer to real world, you'll feel the magic better:
+But by getting a little bit closer to the real world, you'll feel the magic better:
 
 ```ts
-import { IncomingMessage } from 'http';
+import type { Context, Generator } from '@contexted/core';
+import type { IncomingMessage } from 'http';
 
-type CustomContext = {
+type HttpContext = Context & {
 	readonly request: {
 		route: string;
 		method: string;
@@ -69,14 +60,14 @@ type CustomContext = {
 	};
 };
 
-type CustomResponse = {
+type HttpResponse = {
 	status: number;
 	headers: { [key: string]: string | string[] };
 	body?: string;
 };
 
-const contextGenerator = (request: IncomingMessage) =>
-	<CustomContext>{
+const contextGenerator: Generator<IncomingMessage, HttpContext> = (request) =>
+	{
 		request: {
 			route: request.url,
 			method: request.method,
@@ -85,10 +76,18 @@ const contextGenerator = (request: IncomingMessage) =>
 		response: { status: 404 },
 	};
 
-const responseGenerator = (context: CustomContext) =>
-	<CustomResponse>{
+const responseGenerator: Generator<HttpContext, HttpResponse> = (context) =>
+	{
 		status: context.response.status,
 		headers: [{ 'Content-Type': context.response.mime }],
 		body: context.response.body,
 	};
 ```
+
+---
+
+< Prev Page
+[Routes](routes.md)
+
+Next Page >
+[Subscribers](subscribers.md)
