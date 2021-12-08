@@ -18,7 +18,7 @@
 
 ## **2.0.0** - 2021-12-08
 
-## Added
+### Added
 
 -   Context parent type
 -   Control whether the next middleware runs using a `next` flag
@@ -28,7 +28,7 @@
 
 ## **< 1.1.0**
 
-## Implemented
+### Implemented
 
 -   Contexts
 -   Middlewares
