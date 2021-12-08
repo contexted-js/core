@@ -1,6 +1,7 @@
 .gitignore
 .npmignore
 
+rollup.config.ts
 babel.config.json
 tsconfig.json
 
