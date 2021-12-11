@@ -25,21 +25,23 @@ import type { Context, Subscriber, Route, Generator } from '@contexted/core';
 
 type UnsubscribeFunction = () => boolean | Promise<boolean>;
 
-function registerRoute<
+function subscribeRoute<
 	Test,
 	MiddlewareContext extends Context,
 	Injectables = any,
 	Request = Context,
-	Response = Request
+	Response = Request,
+	ImmutableContext = false
 >(
 	subscriber: Subscriber<Test, Request, Response>,
 	route: Route<Test, MiddlewareContext, Injectables, true>,
 	contextGenerator?: Generator<Request, MiddlewareContext>,
-	responseGenerator?: Generator<MiddlewareContext, Response>
+	responseGenerator?: Generator<MiddlewareContext, Response>,
+	immutableContext = false
 ): UnsubscribeFunction;
 ```
 
-Notice that `subscribeRoute` function only supports [context immutable middlewares](../concepts/middlewares.md#context-immutable-middlewares).
+`subscribeRoute` function is designed to be used with [context immutable middlewares](../concepts/middlewares.md#context-immutable-middlewares). But you can change this behavior by changing the immutableContext flag to false.
 
 Also If you don't provide any generators, an echo generator will be used instead:
 
@@ -52,7 +54,7 @@ const echoGenerator: Generator<Input, Output> = (input: Input) => input as any;
 Pretty straightforward:
 
 ```ts
-import { registerRoute } from '@contexted/core';
+import { subscribeRoute } from '@contexted/core';
 
 import {
 	subscriber,
@@ -61,11 +63,27 @@ import {
 	responseGenerator,
 } from './your-code';
 
-const unsubscriber = registerRoute(
+const unsubscriber = subscribeRoute(
 	subscriber,
 	immutableContextRoute,
 	contextGenerator,
 	responseGenerator
+);
+```
+
+This example uses mutable contexts and no generators:
+
+```ts
+import { subscribeRoute } from '@contexted/core';
+
+import { subscriber, mutableContextRoute } from './your-code';
+
+const unsubscriber = subscribeRoute(
+	subscriber,
+	mutableContextRoute,
+	null,
+	null,
+	false
 );
 ```
 

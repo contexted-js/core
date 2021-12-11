@@ -16,6 +16,14 @@
 
 ---
 
+## **2.1.0** - 2021-12-11
+
+### Added
+
+-   Immutable context mode support for `subscribeRoute` function
+
+---
+
 ## **2.0.0** - 2021-12-08
 
 ### Added
@@ -25,6 +33,8 @@
 -   Optional immutability for contexts
 -   Better functional and object-oriented implementations
 -   [ES Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) support, both cjs and mjs versions available in distribution
+
+---
 
 ## **< 1.1.0**
 

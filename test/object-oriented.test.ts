@@ -1,8 +1,7 @@
-import type { Generator, Context, SubscriberHandler } from '../src';
+import type { SubscriberHandler } from '../src';
 import { Contexted } from '../src';
 
 import {
-	TestContext,
 	contextGenerator,
 	responseGenerator,
 	responseGeneratorFlag,
@@ -142,7 +141,7 @@ describe('with mutable context', () => {
 describe('with immutable context', () => {
 	const driver = new Driver();
 	const application = new Contexted({
-		subscriber: (test, handler) => driver.subscribe(test, handler),
+		subscriber: (test: string, handler) => driver.subscribe(test, handler),
 		contextGenerator,
 		responseGenerator,
 		immutableContext: true,
@@ -179,7 +178,10 @@ describe('with immutable context', () => {
 			test: 'replace',
 			controllers: [
 				{
-					middleware: (context, ...map) => {
+					middleware: (
+						context,
+						...map: { [key: string]: string }[]
+					) => {
 						let response = context.request;
 
 						for (const rules of map)

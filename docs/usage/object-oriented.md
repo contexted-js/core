@@ -58,7 +58,7 @@ class Contexted<
 }
 ```
 
-Unlike `subscribeRoute` function, `Contexted` class supports both [context mutable](../concepts/middlewares.md#context-mutable-middlewares) and [context immutable](../concepts/middlewares.md#context-immutable-middlewares) middlewares, which you can switch between using `immutableContext` flag in your configuration. It is set to `false` (context mutable) by default.
+Unlike the `subscribeRoute` function, `Contexted` class uses [context mutable middlewares](../concepts/middlewares.md#context-mutable-middlewares) by default. In order to use [context immutable middlewares](../concepts/middlewares.md#context-immutable-middlewares), you should set `immutableContext` flag in your configuration to true.
 
 ## Examples
 
@@ -80,7 +80,7 @@ const application = new Contexted({
 	responseGenerator,
 });
 
-const unsubscriber = await application.registerRoute(mutableContextRoute);
+const unsubscriber = await application.subscribeRoute(mutableContextRoute);
 ```
 
 Another example with a constructed driver, without a context generator and using immutable contexts:
@@ -101,10 +101,10 @@ const application = new Contexted({
 	subscriber: (test, handler) => driver.subscribe(test, handler),
 	null,
 	responseGenerator,
-	immutableContext: true,
+	true,
 });
 
-const unsubscriber = await application.registerRoute(immutableContextRoute);
+const unsubscriber = await application.subscribeRoute(immutableContextRoute);
 ```
 
 ---

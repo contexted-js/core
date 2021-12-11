@@ -5,7 +5,7 @@ export type Context = { next: boolean };
 export type Middleware<
 	ContextType extends Context,
 	InjectablesType = any,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > = (
 	context: ContextType,
 	...injectables: InjectablesType[]
@@ -14,7 +14,7 @@ export type Middleware<
 export type Controller<
 	ContextType extends Context,
 	InjectablesType = any,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > = {
 	middleware: Middleware<ContextType, InjectablesType, ImmutableContext>;
 	injectables?: InjectablesType[];
@@ -24,7 +24,7 @@ export type Route<
 	TestType,
 	ContextType extends Context,
 	InjectablesType = any,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > = {
 	test: TestType;
 	controllers: Controller<ContextType, InjectablesType, ImmutableContext>[];
@@ -45,62 +45,55 @@ export type Generator<DataType, OutputType> = (
 	input: DataType
 ) => AsyncReturn<OutputType>;
 
-async function handleImmutableControllers<
-	ContextType extends Context,
-	InjectablesType = any
->(
-	context: ContextType,
-	...controllers: Controller<ContextType, InjectablesType, true>[]
-): Promise<ContextType> {
-	if (controllers.length === 0 || !context.next) return context;
-
-	const controller = controllers[0];
-	const result = await controller.middleware(
-		context,
-		...(controller.injectables || [])
-	);
-
-	return await handleImmutableControllers(result, ...controllers.slice(1));
-}
-
 export async function subscribeRoute<
 	TestType,
 	ContextType extends Context,
 	InjectablesType = any,
 	RequestType = ContextType,
-	ResponseType = RequestType
+	ResponseType = RequestType,
+	ImmutableContext extends boolean = true
 >(
 	subscriber: Subscriber<TestType, RequestType, ResponseType>,
-	route: Route<TestType, ContextType, InjectablesType, true>,
+	route: Route<TestType, ContextType, InjectablesType, ImmutableContext>,
 	contextGenerator?: Generator<RequestType, ContextType>,
-	responseGenerator?: Generator<ContextType, ResponseType>
+	responseGenerator?: Generator<ContextType, ResponseType>,
+	immutableContext?: ImmutableContext
 ) {
+	if (immutableContext === undefined || immutableContext === null)
+		immutableContext = true as any;
+
 	return await subscriber(route.test, async (request) => {
-		const context: ContextType = contextGenerator
+		let context: ContextType = contextGenerator
 			? contextGenerator(request)
 			: (request as any);
 
+		for (const controller of route.controllers || []) {
+			const result = await controller.middleware(
+				context,
+				...(controller.injectables || [])
+			);
+
+			if (immutableContext) context = result;
+			if (!context.next) break;
+		}
+
 		return responseGenerator
-			? responseGenerator(
-					await handleImmutableControllers(
-						context,
-						...route.controllers
-					)
-			  )
+			? responseGenerator(context)
 			: (context as any);
 	});
 }
 
-export type ContextedConfiguration<
+export type Configuration<
 	TestType,
 	ContextType extends Context,
 	RequestType = ContextType,
-	ResponseType = RequestType
+	ResponseType = RequestType,
+	ImmutableContext extends boolean = false
 > = {
 	subscriber: Subscriber<TestType, RequestType, ResponseType>;
 	contextGenerator?: Generator<RequestType, ContextType>;
 	responseGenerator?: Generator<ContextType, ResponseType>;
-	immutableContext?: boolean;
+	immutableContext?: ImmutableContext;
 };
 
 export class Contexted<
@@ -109,7 +102,7 @@ export class Contexted<
 	InjectablesType = any,
 	RequestType = ContextType,
 	ResponseType = RequestType,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > {
 	private subscriber: Subscriber<TestType, RequestType, ResponseType>;
 	private contextGenerator: Generator<RequestType, ContextType>;
@@ -117,7 +110,7 @@ export class Contexted<
 	private immutableContext: boolean;
 
 	constructor(
-		configuration: ContextedConfiguration<
+		configuration: Configuration<
 			TestType,
 			ContextType,
 			RequestType,
@@ -127,64 +120,18 @@ export class Contexted<
 		this.subscriber = configuration.subscriber;
 		this.contextGenerator = configuration.contextGenerator;
 		this.responseGenerator = configuration.responseGenerator;
-		this.immutableContext = configuration.immutableContext;
+		this.immutableContext = configuration.immutableContext || false;
 	}
 
 	async subscribeRoute(
 		route: Route<TestType, ContextType, InjectablesType, ImmutableContext>
 	) {
-		const unsubscriber = await this.subscriber(
-			route.test,
+		return subscribeRoute(
+			this.subscriber,
+			route,
+			this.contextGenerator,
+			this.responseGenerator,
 			this.immutableContext
-				? (request) =>
-						this.immutableRequestHandler(
-							request,
-							...route.controllers
-						)
-				: (request) =>
-						this.requestHandler(request, ...route.controllers)
 		);
-
-		return async () => await unsubscriber();
-	}
-
-	private async requestHandler(
-		request: RequestType,
-		...controllers: Controller<ContextType, InjectablesType, false>[]
-	) {
-		const context: ContextType = this.contextGenerator
-			? this.contextGenerator(request)
-			: (request as any);
-
-		for (const controller of controllers || []) {
-			await controller.middleware(
-				context,
-				...(controller.injectables || [])
-			);
-
-			if (!context.next) break;
-		}
-
-		return this.responseGenerator
-			? this.responseGenerator(context)
-			: (context as any);
-	}
-
-	private async immutableRequestHandler(
-		request: RequestType,
-		...controllers: Controller<ContextType, InjectablesType, true>[]
-	) {
-		const context: ContextType = this.contextGenerator
-			? this.contextGenerator(request)
-			: (request as any);
-
-		const result = await handleImmutableControllers(
-			context,
-			...controllers
-		);
-
-		return this.responseGenerator
-			? this.responseGenerator(result)
-			: (result as any);
 	}
 }

@@ -24,9 +24,9 @@ type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
 type Context = { next: boolean };
 
 type Middleware<
-	MiddlewareContext extends Context,
-	Injectables = any,
-	ImmutableContext = false
+	ContextType extends Context,
+	InjectablesType = any,
+	ImmutableContext extends boolean = false
 > = (
 	context: MiddlewareContext,
 	...injectables: Injectables[]
@@ -35,7 +35,7 @@ type Middleware<
 type Controller<
 	MiddlewareContext extends Context,
 	Injectables = any,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > = {
 	middleware: Middleware<MiddlewareContext, Injectables, ImmutableContext>;
 	injectables?: Injectables[];
@@ -45,7 +45,7 @@ type Route<
 	Test,
 	MiddlewareContext extends Context,
 	Injectables = any,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > = {
 	test: Test;
 	controllers: Controller<MiddlewareContext, Injectables, ImmutableContext>[];
@@ -64,16 +64,17 @@ type Subscriber<Test, Request, Response = Request> = (
 
 type Generator<Input, Output> = (input: Input) => AsyncReturn<Output>;
 
-type ContextedConfiguration<
+type Configuration<
 	Test,
 	MiddlewareContext extends Context,
 	Request = MiddlewareContext,
-	Response = Request
+	Response = Request,
+	ImmutableContext extends boolean = false
 > = {
 	subscriber: Subscriber<Test, Request, Response>;
 	contextGenerator?: ContextTransformer<Request, MiddlewareContext>;
 	responseGenerator?: ContextTransformer<MiddlewareContext, Response>;
-	immutableContext?: boolean;
+	immutableContext?: ImmutableContext;
 };
 ```
 
@@ -85,12 +86,14 @@ async function subscribeRoute<
 	MiddlewareContext extends Context,
 	Injectables = any,
 	Request = MiddlewareContext,
-	Response = Request
+	Response = Request,
+	ImmutableContext extends boolean = true
 >(
 	subscriber: Subscriber<Test, Request, Response>,
 	route: Route<Test, MiddlewareContext, Injectables, true>,
 	contextGenerator?: Generator<Request, MiddlewareContext>,
-	responseGenerator?: Generator<MiddlewareContext, Response>
+	responseGenerator?: Generator<MiddlewareContext, Response>,
+	immutableContext?: ImmutableContext
 ): Promise<UnsubscribeFunction>;
 ```
 
@@ -103,7 +106,7 @@ class Contexted<
 	Injectables = any,
 	Request = MiddlewareContext,
 	Response = Request,
-	ImmutableContext = false
+	ImmutableContext extends boolean = false
 > {
 	constructor(
 		private configuration: ContextedConfiguration<
@@ -114,7 +117,7 @@ class Contexted<
 		>
 	): void;
 
-	registerRoute(
+	subscribeRoute(
 		route: Route<Test, MiddlewareContext, Injectables, ImmutableContext>
 	): UnsubscribeFunction;
 }
