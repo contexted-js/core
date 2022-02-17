@@ -19,82 +19,52 @@
 ## Types
 
 ```ts
-type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
+type PromiseOrValue<ValueType> = Promise<ValueType> | ValueType;
 
-type Context = { next: boolean };
-
-type Middleware<
-	ContextType extends Context,
-	InjectablesType = any,
-	ImmutableContext extends boolean = false
-> = (
-	context: MiddlewareContext,
+type Middleware<Context, Injectables, IsImmutable extends boolean> = (
+	context: Context,
 	...injectables: Injectables[]
-) => AsyncReturn<ImmutableContext extends true ? MiddlewareContext : any>;
+) => PromiseOrValue<IsImmutable extends true ? Context : void>;
 
-type Controller<
-	MiddlewareContext extends Context,
-	Injectables = any,
-	ImmutableContext extends boolean = false
-> = {
-	middleware: Middleware<MiddlewareContext, Injectables, ImmutableContext>;
+type Controller<Context, Injectables, IsImmutable extends boolean> = {
+	middleware: Middleware<Context, Injectables, IsImmutable>;
 	injectables?: Injectables[];
 };
 
-type Route<
-	Test,
-	MiddlewareContext extends Context,
-	Injectables = any,
-	ImmutableContext extends boolean = false
-> = {
+type Route<Test, Context, Injectables, IsImmutable extends boolean> = {
 	test: Test;
-	controllers: Controller<MiddlewareContext, Injectables, ImmutableContext>[];
+	controllers: Controller<Context, Injectables, IsImmutable>[];
 };
 
-type UnsubscribeFunction = () => AsyncReturn<boolean>;
+type Transformer<InputType, OutputType> = (
+	input: InputType
+) => PromiseOrValue<OutputType>;
 
-type SubscriberHandler<Request, Response = Request> = (
-	request: Request
-) => AsyncReturn<Response>;
+type Traverser<Context, Injectables, IsImmutable extends boolean> = (
+	context: Context,
+	...controllers: Controller<Context, Injectables, IsImmutable>[]
+) => PromiseOrValue<Context>;
 
-type Subscriber<Test, Request, Response = Request> = (
+type Unsubscriber = () => PromiseOrValue<void>;
+
+type Subscriber<Test, Request, Response> = (
 	test: Test,
-	handler: SubscriberHandler<Request, Response>
-) => AsyncReturn<UnsubscribeFunction>;
-
-type Generator<Input, Output> = (input: Input) => AsyncReturn<Output>;
+	callback: Transformer<Request, Response>
+) => PromiseOrValue<Unsubscriber>;
 
 type Configuration<
 	Test,
-	MiddlewareContext extends Context,
-	Request = MiddlewareContext,
-	Response = Request,
-	ImmutableContext extends boolean = false
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
 > = {
 	subscriber: Subscriber<Test, Request, Response>;
-	contextGenerator?: ContextTransformer<Request, MiddlewareContext>;
-	responseGenerator?: ContextTransformer<MiddlewareContext, Response>;
-	immutableContext?: ImmutableContext;
+	traverser: Traverser<Context, Injectables, IsImmutable>;
+	requestTransformer: Transformer<Request, Context>;
+	responseTransformer: Transformer<Context, Response>;
 };
-```
-
-## Methods
-
-```ts
-async function subscribeRoute<
-	Test,
-	MiddlewareContext extends Context,
-	Injectables = any,
-	Request = MiddlewareContext,
-	Response = Request,
-	ImmutableContext extends boolean = true
->(
-	subscriber: Subscriber<Test, Request, Response>,
-	route: Route<Test, MiddlewareContext, Injectables, true>,
-	contextGenerator?: Generator<Request, MiddlewareContext>,
-	responseGenerator?: Generator<MiddlewareContext, Response>,
-	immutableContext?: ImmutableContext
-): Promise<UnsubscribeFunction>;
 ```
 
 ## Constructors
@@ -102,25 +72,49 @@ async function subscribeRoute<
 ```ts
 class Contexted<
 	Test,
-	MiddlewareContext extends Context,
-	Injectables = any,
-	Request = MiddlewareContext,
-	Response = Request,
-	ImmutableContext extends boolean = false
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
 > {
 	constructor(
-		private configuration: ContextedConfiguration<
+		private configuration: Configuration<
 			Test,
-			MiddlewareContext,
+			Context,
+			Injectables,
 			Request,
-			Response
+			Response,
+			IsImmutable
 		>
 	): void;
 
-	subscribeRoute(
-		route: Route<Test, MiddlewareContext, Injectables, ImmutableContext>
-	): UnsubscribeFunction;
+	async subscribeRoute(
+		route: Route<Test, Context, Injectables, IsImmutable>
+	): Promise<Unsubscriber>;
 }
+```
+
+## Methods
+
+```ts
+function createContextedInstance<
+	Test,
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
+>(
+	configuration: Configuration<
+		Test,
+		Context,
+		Injectables,
+		Request,
+		Response,
+		IsImmutable
+	>
+): Contexted<Test, Context, Injectables, Request, Response, IsImmutable>;
 ```
 
 < Prev Page

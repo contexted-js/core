@@ -1,6 +1,6 @@
 {
 	"name": "@contexted/core",
-	"version": "2.1.1",
+	"version": "3.0.0",
 	"description": "Abstract TypeScript application framework",
 	"keywords": [
 		"typescript",
@@ -31,7 +31,8 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "rimraf dist && rollup --config rollup.config.ts --configPlugin typescript && tsc",
-		"test": "jest"
+		"test": "jest",
+		"publish": "np"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.16.0",

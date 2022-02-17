@@ -16,11 +16,30 @@
 
 ---
 
+## **3.0.0** - 2022-02-17
+
+### Added
+
+-   [Middleware Traverser](./docs/concepts/traverser.md)
+-   [New usage methods](./docs/usage/README.md)
+
+### Modified
+
+-   **Generators** are now called [Transformer](./docs/concepts/transformers.md)
+
+### Removed
+
+-   Immutability flag, in favor of traversers
+-   **next** flag, in favor of traversers
+-   Strict **subscribeRoute** function, in favor of **createContextedInstance**
+
+---
+
 ## **2.1.1** - 2021-12-11
 
 ### Added
 
--   Immutable context mode support for `subscribeRoute` function
+-   Immutable context mode support for **subscribeRoute** function
 
 ---
 
@@ -29,10 +48,10 @@
 ### Added
 
 -   Context parent type
--   Control whether the next middleware runs using a `next` flag
+-   Control whether the next middleware runs using a **next** flag
 -   Optional immutability for contexts
 -   Better functional and object-oriented implementations
--   [ES Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) support, both cjs and mjs versions available in distribution
+-   [ES Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) support, both cjs and mjs versions are available in distribution
 
 ---
 

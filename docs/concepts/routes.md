@@ -20,18 +20,12 @@
 
 ### Controller
 
-As mentioned in the [`Middlewares`]('middlewares.md') section, they can receive injectables. An object containing a middleware and objects to be injected is called a `Controller`:
+As mentioned in the [Middlewares](middlewares.md) section, they can receive injectables. An object containing a middleware and objects to be injected is called a **Controller**:
 
 ```ts
-import type { Context } from '@contexted/core';
-
-type Controller<
-	MiddlewareContext extends Context,
-	InjectablesType = any,
-	ImmutableContext = false
-> = {
-	middleware: Middleware<MiddlewareContext, InjectablesType = any, ImmutableContext = false>;
-	injectables?: InjectablesType[];
+type Controller<Context, Injectables, IsImmutable extends boolean> = {
+	middleware: Middleware<Context, Injectables, IsImmutable>;
+	injectables?: Injectables[];
 };
 ```
 
@@ -40,16 +34,9 @@ type Controller<
 A `Route` is an object that shows which controllers should be executed when which test case happens:
 
 ```ts
-import type { Context } from '@contexted/core';
-
-type Route<
-	Test,
-	MiddlewareContext extends Context,
-	Injectables = any,
-	ImmutableContext = false
-> = {
+type Route<Test, Context, Injectables, IsImmutable extends boolean> = {
 	test: Test;
-	controllers: Controller<MiddlewareContext, Injectables, ImmutableContext>[];
+	controllers: Controller<MiddlewareContext, Injectables, IsImmutable>[];
 };
 ```
 
@@ -58,9 +45,10 @@ type Route<
 Here's a very simple route, which only has one middleware, without any injectables:
 
 ```ts
-import type { EchoContext } from './your-code';
+import type { EchoContext } from 'your-code';
+import { echoMiddleware as middleware } from 'your-code';
 
-const echoController: Controller<EchoContext> = { middleware: echoMiddleware };
+const echoController: Controller<EchoContext> = { middleware };
 const echoRoute = {
 	test: 'echo',
 	controllers: [echoController],
@@ -76,7 +64,7 @@ import type {
 	AuthGuard,
 	DatabaseService,
 	ContentCreateBodyScheme,
-} from './your-code';
+} from 'your-code';
 
 import {
 	databaseService,
@@ -87,12 +75,13 @@ import {
 	addContentMiddleware,
 	apiResponseGeneratorMiddleware,
 	logMiddleware,
-} from './your-code';
+} from 'your-code';
 
 const createContentRoute: Route<
 	Test,
 	Context,
-	AuthGuard | DatabaseService | ContentCreateBodyScheme
+	AuthGuard | DatabaseService | ContentCreateBodyScheme,
+	true
 > = {
 	test: {
 		path: '/api/content',
@@ -124,4 +113,4 @@ const createContentRoute: Route<
 [Middlewares](middlewares.md)
 
 Next Page >
-[Generators](generators.md)
+[Transformers](transformers.md)

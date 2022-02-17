@@ -20,38 +20,45 @@
 
 ### Contexts
 
-Simply put, a `Context` is a state-holder data unit. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they can also be shared between different data processors.
-
-Contexted `Context`s are mutable and always should have a `next` boolean attribute to indicate whether to run the next middleware or not:
-
-```ts
-type Context = { next: boolean };
-```
+Simply put, a **Context** is a state-holder data unit. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they are state objects shared between different data processors (aka [Middlewares](middlewares.md)).
 
 ## Examples
 
 Unrealistic dead-simple example:
 
 ```ts
-const context = {
-	content: null,
-	next: true,
-};
+type Context = { content: string };
+
+const context: Context = { content: 'request' };
 ```
 
 Better example:
 
 ```ts
-import type { Context } from '@contexted/core';
-
-type CliContext = Context & {
-	readonly request: string;
-	response: string[];
+type Request = {
+	readonly url: string;
+	readonly method: string;
+	readonly body?: Buffer;
 };
 
-const context: CliContext = {
-	request: 'run command --argA --argB',
-	response: [],
+type Response = {
+	status: number;
+	mime?: string;
+	body?: any;
+};
+
+type HttpContext = {
+	readonly request: Request;
+	response: Response;
+	next: boolean;
+};
+
+const context: HttpContext = {
+	request: {
+		url: '/',
+		method: 'GET',
+	},
+	response: { status: 404 },
 	next: true,
 };
 ```

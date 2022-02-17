@@ -18,35 +18,26 @@
 
 ## Explain
 
-Contexted exports a function named `subscribeRoute`. It generates a handler function and subscribes using provided subscriber:
+Contexted exports a function named **createContextedInstance**. It constructs a **Contexted** instance for functional usage:
 
 ```ts
-import type { Context, Subscriber, Route, Generator } from '@contexted/core';
-
-type UnsubscribeFunction = () => boolean | Promise<boolean>;
-
-function subscribeRoute<
+export function createContextedInstance<
 	Test,
-	MiddlewareContext extends Context,
-	Injectables = any,
-	Request = Context,
-	Response = Request,
-	ImmutableContext = false
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
 >(
-	subscriber: Subscriber<Test, Request, Response>,
-	route: Route<Test, MiddlewareContext, Injectables, true>,
-	contextGenerator?: Generator<Request, MiddlewareContext>,
-	responseGenerator?: Generator<MiddlewareContext, Response>,
-	immutableContext = false
-): UnsubscribeFunction;
-```
-
-`subscribeRoute` function is designed to be used with [context immutable middlewares](../concepts/middlewares.md#context-immutable-middlewares). But you can change this behavior by changing the immutableContext flag to false.
-
-Also If you don't provide any generators, an echo generator will be used instead:
-
-```ts
-const echoGenerator: Generator<Input, Output> = (input: Input) => input as any;
+	configuration: Configuration<
+		Test,
+		Context,
+		Injectables,
+		Request,
+		Response,
+		IsImmutable
+	>
+): Contexted<Test, Context, Injectables, Request, Response, IsImmutable>;
 ```
 
 ## Examples
@@ -54,43 +45,30 @@ const echoGenerator: Generator<Input, Output> = (input: Input) => input as any;
 Pretty straightforward:
 
 ```ts
-import { subscribeRoute } from '@contexted/core';
+import { createContextedInstance } from '@contexted/core';
 
 import {
 	subscriber,
+	traverser,
+	requestTransformer,
+	responseTransformer,
 	immutableContextRoute,
-	contextGenerator,
-	responseGenerator,
-} from './your-code';
+} from 'your-code';
 
-const unsubscriber = subscribeRoute(
+const application = createContextedInstance(
 	subscriber,
-	immutableContextRoute,
-	contextGenerator,
-	responseGenerator
+	traverser,
+	requestTransformer,
+	responseTransformer
 );
-```
 
-This example uses mutable contexts and no generators:
-
-```ts
-import { subscribeRoute } from '@contexted/core';
-
-import { subscriber, mutableContextRoute } from './your-code';
-
-const unsubscriber = subscribeRoute(
-	subscriber,
-	mutableContextRoute,
-	null,
-	null,
-	false
-);
+const unsubscriber = await application.subscribeRoute(immutableContextRoute);
 ```
 
 ---
 
 < Prev Page
-[Usage](README.md)
+[Object Oriented](object-oriented.md)
 
 Next Page >
-[Object Oriented](object-oriented.md)
+[API Refrence](../api-refrence.md)

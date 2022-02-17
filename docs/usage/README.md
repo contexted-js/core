@@ -18,8 +18,8 @@
 
 ## Usage Methods
 
--   [Functional](functional.md)
 -   [Object Oriented](object-oriented.md)
+-   [Functional](functional.md)
 
 ---
 
@@ -27,4 +27,4 @@
 [Subscribers](../concepts/subscribers.md)
 
 Next Page >
-[Functional](functional.md)
+[Object Oriented](object-oriented.md)

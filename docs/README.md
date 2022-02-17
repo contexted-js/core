@@ -23,11 +23,12 @@
     -   [Contexts](concepts/contexts.md)
     -   [Middlewares](concepts/middlewares.md)
     -   [Routes](concepts/routes.md)
-    -   [Generators](concepts/generators.md)
+    -   [Transformers](concepts/transformers.md)
+    -   [Traverser](concepts/traverser.md)
     -   [Subscribers](concepts/subscribers.md)
 -   [Usage](usage/README.md)
-    -   [Functional](usage/functional.md)
     -   [Object Oriented](usage/object-oriented.md)
+    -   [Functional](usage/functional.md)
 -   [API Refrence](api-refrence.md)
 
 ---

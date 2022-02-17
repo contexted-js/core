@@ -1,137 +1,173 @@
-export type AsyncReturn<ReturnType> = ReturnType | Promise<ReturnType>;
+export type PromiseOrValue<ValueType> = Promise<ValueType> | ValueType;
 
-export type Context = { next: boolean };
+export type Middleware<Context, Injectables, IsImmutable extends boolean> = (
+	context: Context,
+	...injectables: Injectables[]
+) => PromiseOrValue<IsImmutable extends true ? Context : void>;
 
-export type Middleware<
-	ContextType extends Context,
-	InjectablesType = any,
-	ImmutableContext extends boolean = false
-> = (
-	context: ContextType,
-	...injectables: InjectablesType[]
-) => AsyncReturn<ImmutableContext extends true ? ContextType : any>;
-
-export type Controller<
-	ContextType extends Context,
-	InjectablesType = any,
-	ImmutableContext extends boolean = false
-> = {
-	middleware: Middleware<ContextType, InjectablesType, ImmutableContext>;
-	injectables?: InjectablesType[];
+export type Controller<Context, Injectables, IsImmutable extends boolean> = {
+	middleware: Middleware<Context, Injectables, IsImmutable>;
+	injectables?: Injectables[];
 };
 
-export type Route<
-	TestType,
-	ContextType extends Context,
-	InjectablesType = any,
-	ImmutableContext extends boolean = false
-> = {
-	test: TestType;
-	controllers: Controller<ContextType, InjectablesType, ImmutableContext>[];
+export type Route<Test, Context, Injectables, IsImmutable extends boolean> = {
+	test: Test;
+	controllers: Controller<Context, Injectables, IsImmutable>[];
 };
 
-export type UnsubscribeFunction = () => AsyncReturn<boolean>;
+export type Transformer<InputType, OutputType> = (
+	input: InputType
+) => PromiseOrValue<OutputType>;
 
-export type SubscriberHandler<RequestType, ResponseType = RequestType> = (
-	request: RequestType
-) => AsyncReturn<ResponseType>;
+export type Traverser<Context, Injectables, IsImmutable extends boolean> = (
+	context: Context,
+	...controllers: Controller<Context, Injectables, IsImmutable>[]
+) => PromiseOrValue<Context>;
 
-export type Subscriber<TestType, RequestType, ResponseType = RequestType> = (
-	test: TestType,
-	handler: SubscriberHandler<RequestType, ResponseType>
-) => AsyncReturn<UnsubscribeFunction>;
+export type Unsubscriber = () => PromiseOrValue<void>;
 
-export type Generator<DataType, OutputType> = (
-	input: DataType
-) => AsyncReturn<OutputType>;
-
-export async function subscribeRoute<
-	TestType,
-	ContextType extends Context,
-	InjectablesType = any,
-	RequestType = ContextType,
-	ResponseType = RequestType,
-	ImmutableContext extends boolean = true
->(
-	subscriber: Subscriber<TestType, RequestType, ResponseType>,
-	route: Route<TestType, ContextType, InjectablesType, ImmutableContext>,
-	contextGenerator?: Generator<RequestType, ContextType>,
-	responseGenerator?: Generator<ContextType, ResponseType>,
-	immutableContext?: ImmutableContext
-) {
-	if (immutableContext === undefined || immutableContext === null)
-		immutableContext = true as any;
-
-	return await subscriber(route.test, async (request) => {
-		let context: ContextType = contextGenerator
-			? contextGenerator(request)
-			: (request as any);
-
-		for (const controller of route.controllers || []) {
-			const result = await controller.middleware(
-				context,
-				...(controller.injectables || [])
-			);
-
-			if (immutableContext) context = result;
-			if (!context.next) break;
-		}
-
-		return responseGenerator
-			? responseGenerator(context)
-			: (context as any);
-	});
-}
+export type Subscriber<Test, Request, Response> = (
+	test: Test,
+	callback: Transformer<Request, Response>
+) => PromiseOrValue<Unsubscriber>;
 
 export type Configuration<
-	TestType,
-	ContextType extends Context,
-	RequestType = ContextType,
-	ResponseType = RequestType,
-	ImmutableContext extends boolean = false
+	Test,
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
 > = {
-	subscriber: Subscriber<TestType, RequestType, ResponseType>;
-	contextGenerator?: Generator<RequestType, ContextType>;
-	responseGenerator?: Generator<ContextType, ResponseType>;
-	immutableContext?: ImmutableContext;
+	subscriber: Subscriber<Test, Request, Response>;
+	traverser: Traverser<Context, Injectables, IsImmutable>;
+	requestTransformer: Transformer<Request, Context>;
+	responseTransformer: Transformer<Context, Response>;
 };
 
 export class Contexted<
-	TestType,
-	ContextType extends Context,
-	InjectablesType = any,
-	RequestType = ContextType,
-	ResponseType = RequestType,
-	ImmutableContext extends boolean = false
+	Test,
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
 > {
-	private subscriber: Subscriber<TestType, RequestType, ResponseType>;
-	private contextGenerator: Generator<RequestType, ContextType>;
-	private responseGenerator: Generator<ContextType, ResponseType>;
-	private immutableContext: boolean;
+	private subscribersCount: number;
+	private subscribers: {
+		[uniqueId: string]: {
+			controllers: Route<
+				Test,
+				Context,
+				Injectables,
+				IsImmutable
+			>['controllers'];
+			unsubscriber: Unsubscriber;
+		};
+	};
+
+	private subscriber: Subscriber<Test, Request, Response>;
+	private traverser: Traverser<Context, Injectables, IsImmutable>;
+	private requestTransformer: Transformer<Request, Context>;
+	private responseTransformer: Transformer<Context, Response>;
 
 	constructor(
 		configuration: Configuration<
-			TestType,
-			ContextType,
-			RequestType,
-			ResponseType
+			Test,
+			Context,
+			Injectables,
+			Request,
+			Response,
+			IsImmutable
 		>
 	) {
+		this.subscribersCount = 0;
+		this.subscribers = {};
+
 		this.subscriber = configuration.subscriber;
-		this.contextGenerator = configuration.contextGenerator;
-		this.responseGenerator = configuration.responseGenerator;
-		this.immutableContext = configuration.immutableContext || false;
+		this.traverser = configuration.traverser;
+		this.requestTransformer = configuration.requestTransformer;
+		this.responseTransformer = configuration.responseTransformer;
 	}
 
 	async subscribeRoute(
-		route: Route<TestType, ContextType, InjectablesType, ImmutableContext>
+		route: Route<Test, Context, Injectables, IsImmutable>
 	) {
-		return subscribeRoute(
-			this.subscriber,
-			route,
-			this.contextGenerator,
-			this.responseGenerator,
-			this.immutableContext
-		);
+		this.subscribersCount++;
+		const uniqueId = this.subscribersCount.toString();
+
+		try {
+			const unsubscriber = await this.subscriber(
+				route.test,
+				async (request) => await this.requestHandler(uniqueId, request)
+			);
+
+			this.subscribers[uniqueId] = {
+				unsubscriber,
+				controllers: route.controllers,
+			};
+		} catch (error) {
+			throw new Error('failed to subscribe route.' + error.toString());
+		}
+
+		return <Unsubscriber>(async () => {
+			if (!this.subscribers[uniqueId])
+				throw new Error(
+					'failed to unsubscribe route. route has already been unsubscribed.'
+				);
+
+			try {
+				await this.subscribers[uniqueId].unsubscriber();
+				delete this.subscribers[uniqueId];
+			} catch (error) {
+				throw new Error(
+					'failed to unsubscribe route.' + error.toString()
+				);
+			}
+
+			if (this.subscribers[uniqueId])
+				throw new Error(
+					'failed to unsubscribe route. route still exists.'
+				);
+		});
 	}
+
+	private async requestHandler(subscriberId: string, request: Request) {
+		if (!this.subscribers[subscriberId])
+			throw new Error(
+				'route not found. route has been unsubscribed or never existed.'
+			);
+
+		try {
+			const context = await this.requestTransformer(request);
+			const result = await this.traverser(
+				context,
+				...this.subscribers[subscriberId].controllers
+			);
+
+			return this.responseTransformer(result);
+		} catch (error) {
+			throw new Error('failed to handle request.' + error.toString());
+		}
+	}
+}
+
+export function createContextedInstance<
+	Test,
+	Context,
+	Injectables,
+	Request,
+	Response,
+	IsImmutable extends boolean
+>(
+	configuration: Configuration<
+		Test,
+		Context,
+		Injectables,
+		Request,
+		Response,
+		IsImmutable
+	>
+) {
+	return new Contexted(configuration);
 }
