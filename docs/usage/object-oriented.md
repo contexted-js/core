@@ -18,7 +18,7 @@
 
 ## Explain
 
-Contexted exports a constructor, which asks for a subscriber, a traverser and optional transformers and will keep and use them for route subscriptions:
+Contexted exports a constructor, which asks for a **subscriber**, a **traverser** and optional **transformers** and will keep and use them for route subscriptions:
 
 ```ts
 import { Subscriber, Transformer } from '@contexted/core';
