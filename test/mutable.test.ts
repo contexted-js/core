@@ -17,7 +17,7 @@ type Immutable = false;
 
 const routes: { [test: Test]: Transformer<Request, Response> } = {};
 
-const timeService = () => new Date();
+const timeService: Injectables = () => new Date();
 
 const emit = async (test: Test, request?: Request) => {
 	if (!routes[test]) return;

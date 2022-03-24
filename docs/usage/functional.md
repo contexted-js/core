@@ -18,7 +18,7 @@
 
 ## Explain
 
-Contexted exports a function named **createContextedInstance**. It constructs a **Contexted** instance for functional usage:
+**Contexted** exports a function named **createContextedInstance**. It constructs a [Contexted instance](object-oriented.md) for functional usage:
 
 ```ts
 export function createContextedInstance<

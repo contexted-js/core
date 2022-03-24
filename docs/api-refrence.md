@@ -118,4 +118,4 @@ function createContextedInstance<
 ```
 
 < Prev Page
-[Object Oriented](usage/object-oriented.md)
+[Functional](usage/functional.md)

@@ -17,7 +17,7 @@ type Immutable = true;
 
 const routes: { [test: Test]: Transformer<Request, Response> } = {};
 
-const timeService = () => new Date();
+const timeService: Injectables = () => new Date();
 
 const emit = async (test: Test, request?: Request) => {
 	if (!routes[test]) return;
@@ -41,7 +41,10 @@ const traverser: Traverser<Context, Injectables, Immutable> = async (
 	...controllers
 ) => {
 	for (const controller of controllers)
-		context = await controller.middleware(context, ...(controller.injectables || []));
+		context = await controller.middleware(
+			context,
+			...(controller.injectables || [])
+		);
 
 	return context;
 };
@@ -81,7 +84,7 @@ describe('Subscribtion', () => {
 							.reverse()
 							.join('');
 
-                        return context;
+						return context;
 					},
 				},
 			],
@@ -107,7 +110,7 @@ describe('Injection', () => {
 							.getFullYear()
 							.toString();
 
-                        return context;
+						return context;
 					},
 					injectables: [timeService],
 				},

@@ -18,12 +18,10 @@
 
 ## Explain
 
-Contexted exports a constructor, which asks for a **subscriber**, a **traverser** and optional **transformers** and will keep and use them for route subscriptions:
+**Contexted** exports a constructor, which asks for a [subscriber](../concepts/subscribers.md), a [traverser](../concepts/traverser.md), and request or response [transformers](../concepts/transformers.md), and will keep and use them for route subscriptions:
 
 ```ts
-import { Subscriber, Transformer } from '@contexted/core';
-
-export type Unsubscriber = () => PromiseOrValue<void>;
+import type { Subscriber, Unsubscriber, Transformer, Traverser } from '@contexted/core';
 
 export type Configuration<
 	Test,
@@ -51,15 +49,16 @@ export class Contexted<
 		private configuration: Configuration<
 			Test,
 			Context,
+			Injectables,
 			Request,
 			Response,
 			IsImmutable
 		>
-	): void;
+	);
 
-	subscribeRoute(
+	async subscribeRoute(
 		route: Route<Test, Context, Injectables, IsImmutable>
-	): Unsubscriber;
+	): Promise<Unsubscriber>;
 }
 ```
 

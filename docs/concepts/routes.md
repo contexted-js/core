@@ -20,9 +20,11 @@
 
 ### Controller
 
-As mentioned in the [Middlewares](middlewares.md) section, they can receive injectables. An object containing a middleware and objects to be injected is called a **Controller**:
+As mentioned in the [middlewares](middlewares.md) section, they can receive **injectables**. An object containing a **middleware** and objects to be injected is called a **controller**:
 
 ```ts
+import type { Middleware } from '@contexted/core';
+
 type Controller<Context, Injectables, IsImmutable extends boolean> = {
 	middleware: Middleware<Context, Injectables, IsImmutable>;
 	injectables?: Injectables[];
@@ -31,12 +33,14 @@ type Controller<Context, Injectables, IsImmutable extends boolean> = {
 
 ### Routes
 
-A `Route` is an object that shows which controllers should be executed when which test case happens:
+A **route** is an object that shows which **controllers** should be executed when which test case happens:
 
 ```ts
+import type { Controller } from '@contexted/core';
+
 type Route<Test, Context, Injectables, IsImmutable extends boolean> = {
 	test: Test;
-	controllers: Controller<MiddlewareContext, Injectables, IsImmutable>[];
+	controllers: Controller<Context, Injectables, IsImmutable>[];
 };
 ```
 
@@ -46,6 +50,7 @@ Here's a very simple route, which only has one middleware, without any injectabl
 
 ```ts
 import type { EchoContext } from 'your-code';
+
 import { echoMiddleware as middleware } from 'your-code';
 
 const echoController: Controller<EchoContext> = { middleware };
@@ -58,6 +63,8 @@ const echoRoute = {
 But this one is a bit more realistic example:
 
 ```ts
+import type { Route } from '@contexted/core';
+
 import type {
 	Test,
 	Context,

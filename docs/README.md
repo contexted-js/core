@@ -19,6 +19,8 @@
 ## Table of Contents
 
 -   [Installation](installation.md)
+    -   [NodeJS](installation.md)
+    -   [Browsers](installation.md#browsers)
 -   [Concepts](concepts/README.md)
     -   [Contexts](concepts/contexts.md)
     -   [Middlewares](concepts/middlewares.md)

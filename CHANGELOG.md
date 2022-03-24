@@ -16,6 +16,16 @@
 
 ---
 
+## **3.1.0** - 2022-03-17
+
+### Added
+
+-   ES3 IIFE release for browser.
+
+### Modified
+
+-   Better ES6 ECMAModule and ES3 CommonJS releases for NodeJS and
+
 ## **3.0.0** - 2022-02-17
 
 ### Added

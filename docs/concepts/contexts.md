@@ -20,7 +20,7 @@
 
 ### Contexts
 
-Simply put, a **Context** is a state-holder data unit. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they are state objects shared between different data processors (aka [Middlewares](middlewares.md)).
+Simply put, a **context** is a state-holder data unit. Originally, the concept was defined to be used for old fashion state handling, like saving data while an interruption is happening, but (as Contexted uses them), they are state objects shared between different data processors.
 
 ## Examples
 
@@ -47,13 +47,13 @@ type Response = {
 	body?: any;
 };
 
-type HttpContext = {
+type Context = {
 	readonly request: Request;
 	response: Response;
 	next: boolean;
 };
 
-const context: HttpContext = {
+const context: Context = {
 	request: {
 		url: '/',
 		method: 'GET',

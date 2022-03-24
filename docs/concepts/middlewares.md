@@ -20,11 +20,11 @@
 
 ### Middlewares
 
-Middlewares are the very basic logic units of a Contexted application.
+Middlewares are the very basic logic units of a **Contexted** application.
 
-A **Middleware** is an asynchronous or synchronous function that receives a [context](contexts.md) and may receive a set of injected objects, and will be used to process the context.
+A **middleware** is an asynchronous or synchronous function that receives a [context](contexts.md) and may receive a set of injected objects, and will be used to process the **context**.
 
-Notice **IsImmutable** generic, which indicates your [contexts](contexts.md) are [immutable](https://en.wikipedia.org/wiki/Immutable_object) or not. If you are using immutable contexts, the middleware should return the resulting [context](contexts.md).
+Notice `IsImmutable` generic, which indicates your **contexts** are [immutable](https://en.wikipedia.org/wiki/Immutable_object) or not. If you are using **immutable** **contexts**, the **middleware** should return the resulting **context**.
 
 ```ts
 import type { PromiseOrValue } from '@contexted/core';
@@ -43,14 +43,15 @@ First, let's look at this simple reverse middleware:
 import type { Middleware } from '@contexted/core';
 
 type Context = string;
+type Injectables = never;
 
-const mutableReverseMiddleware: Middleware<Context, never, false> = (
+const mutableReverseMiddleware: Middleware<Context, Injectables, false> = (
 	context
 ) => {
 	context.content = context.content.split('').reverse().join('');
 };
 
-const immutableReverseMiddleware: Middleware<Context, never, true> = (
+const immutableReverseMiddleware: Middleware<Context, Injectables, true> = (
 	context
 ) => context.split('').reverse().join('');
 ```
@@ -65,13 +66,15 @@ type Context = {
 	response: string;
 };
 
-const mutableReverseMiddleware: Middleware<Context, never, false> = (
+type Injectables = never;
+
+const mutableReverseMiddleware: Middleware<Context, Injectables, false> = (
 	context
 ) => {
 	context.response = context.request.split('').reverse().join('');
 };
 
-const immutableReverseMiddleware: Middleware<Context, never, true> = (
+const immutableReverseMiddleware: Middleware<Context, Injectables, true> = (
 	context
 ) => {
 	context.response = context.request.split('').reverse().join('');
@@ -86,7 +89,7 @@ import type { Middleware } from '@contexted/core';
 
 import type { DatabaseService } from 'your-code';
 
-type HttpContext = {
+type Context = {
 	readonly request: {
 		readonly route: string;
 		readonly method: string;
@@ -100,11 +103,12 @@ type HttpContext = {
 	next: true;
 };
 
-const mutableLoginMiddleware: Middleware<
-	HttpContext,
-	DatabaseService,
-	false
-> = (context, $database) => {
+type Injectables = DatabaseService;
+
+const mutableLoginMiddleware: Middleware<Context, Injectables, false> = (
+	context,
+	$database
+) => {
 	const user = $database.get(context.request.body?.username);
 
 	context.response.status = user ? 200 : 404;
@@ -112,11 +116,10 @@ const mutableLoginMiddleware: Middleware<
 	context.response.body = user ? { user } : { error: 'user not found' };
 };
 
-const immutableLoginMiddleware: Middleware<
-	HttpContext,
-	DatabaseService,
-	true
-> = (context, $database) => {
+const immutableLoginMiddleware: Middleware<Context, Injectables, true> = (
+	context,
+	$database
+) => {
 	const user = $database.get(context.request.body?.username);
 
 	return {

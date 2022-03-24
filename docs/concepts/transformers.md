@@ -20,7 +20,7 @@
 
 ### Transformers
 
-As mentioned, Contexted is an abstract framework, which means it separates [middlewares](middlewares.md), from what triggers them. But our logic is completely based on our logic type, and it will make it tricky to change your infrastructure (Driver, Trigger, whatever). **Transformers** are simple functions that will receive an object with input type and will return another object with output type:
+As mentioned, **Contexted** is an abstract framework, which means it separates [middlewares](middlewares.md), from what triggers them. But our logic is completely based on our logic type, and it will make it tricky to change your infrastructure (Driver, Trigger, whatever). **Transformers** are simple functions that will receive an object with input type and will return another object with output type:
 
 ```ts
 import type { PromiseOrValue } from '@contexted/core';
@@ -30,7 +30,7 @@ export type Transformer<InputType, OutputType> = (
 ) => PromiseOrValue<OutputType>;
 ```
 
-You can use two types of **Transformers** with Contexted, one to generate [context](contexts.md) from emitted request, and the other to generate a response from the resulting [context](contexts.md).
+You can use two types of **Transformers** with Contexted, one to generate a [context](contexts.md) from emitted **request**, and the other to generate a **response** from the resulting **context**.
 
 ## Examples
 
@@ -47,9 +47,10 @@ But by getting a little bit closer to the real world, you'll feel the magic bett
 
 ```ts
 import type { Transformer } from '@contexted/core';
+
 import type { IncomingMessage } from 'http';
 
-type HttpContext = {
+type Context = {
 	readonly request: {
 		route: string;
 		method: string;
@@ -63,13 +64,13 @@ type HttpContext = {
 	next: boolean;
 };
 
-type HttpResponse = {
+type Response = {
 	status: number;
 	headers: { [key: string]: string | string[] };
 	body?: string;
 };
 
-const contextTransformer: Transformer<IncomingMessage, HttpContext> = (request) =>
+const contextTransformer: Transformer<IncomingMessage, Context> = (request) =>
 	{
 		request: {
 			route: request.url,
@@ -80,7 +81,7 @@ const contextTransformer: Transformer<IncomingMessage, HttpContext> = (request) 
 		next: true
 	};
 
-const responseTransformer: Transformer<HttpContext, HttpResponse> = (context) =>
+const responseTransformer: Transformer<Context, Response> = (context) =>
 	{
 		status: context.response.status,
 		headers: [{ 'Content-Type': context.response.mime }],

@@ -20,10 +20,10 @@
 
 ### Traverser
 
-Normally, a middleware-based framework will run middlewares in sequence, and contexts may be mutable or immutable. Contexted uses a traverser function to decide how to use controllers for a certain context.
+Normally, a middleware-based framework will run [middlewares](middlewares.md) in sequence, and [contexts](contexts.md) may be **mutable** or **immutable**. **Contexted** uses a **Traverser** function to decide how to use [controllers](routes.md#controller) for a certain **context**.
 
 ```ts
-import type { PromiseOrValue } from '@contexted/core';
+import type { PromiseOrValue, Controller } from '@contexted/core';
 
 export type Traverser<Context, Injectables, IsImmutable extends boolean> = (
 	context: Context,
@@ -33,10 +33,11 @@ export type Traverser<Context, Injectables, IsImmutable extends boolean> = (
 
 ## Examples
 
-Simple sequential traverser, with no injectables and mutable contexts:
+Simple sequential traverser, with mutable contexts and no injectables:
 
 ```ts
 import type { Traverser } from '@contexted/core';
+
 import type { Context } from 'your-code';
 
 const traverser: Traverser<Context, never, false> = (
