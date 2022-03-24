@@ -65,7 +65,7 @@ import { Contexted, createContextedInstance } from '@contexted/core';
 
 ### Installation
 
-`@contexted/core` package is available on [unpkg CDN](unpkg.com/@contexted/core) for in-browser implementations:
+`@contexted/core` package is available on [unpkg CDN](https://unpkg.com/@contexted/core) for in-browser implementations:
 
 ```html
 <script src="unpkg.com/@contexted/core"></script>
